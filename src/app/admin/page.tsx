@@ -21,7 +21,8 @@ import {
   TrendingUp,
   MoreHorizontal,
   Check,
-  RotateCcw
+  RotateCcw,
+  RefreshCw
 } from "lucide-react";
 import { SocialIcon } from "@/components/SocialIcon";
 import defaultData from "../../../data/links.json";
@@ -43,6 +44,7 @@ export default function AdminPage() {
   const [showPin, setShowPin] = useState(false);
   const [showLoginPin, setShowLoginPin] = useState(false);
   const [pinUpdated, setPinUpdated] = useState(false);
+  const [refreshingClicks, setRefreshingClicks] = useState(false);
 
   // Profile Form State
   const [profileName, setProfileName] = useState(defaultData.profile.name);
@@ -89,11 +91,54 @@ export default function AdminPage() {
       })
       .catch((e) => console.log(e));
 
+    // Fetch live cloud click analytics
+    fetch("/api/clicks")
+      .then((res) => res.json())
+      .then((clickRes) => {
+        if (clickRes && clickRes.clicks) {
+          setData((prev) => {
+            const merged = prev.links.map((link) => {
+              const cloudVal = clickRes.clicks[link.id];
+              return typeof cloudVal === "number" && cloudVal >= (link.clicks || 0)
+                ? { ...link, clicks: cloudVal }
+                : link;
+            });
+            const updated = { ...prev, links: merged };
+            localStorage.setItem("dan1elcodm_links_data", JSON.stringify(updated));
+            return updated;
+          });
+        }
+      })
+      .catch(() => {});
+
     // Check if previously logged in this session
     if (sessionStorage.getItem("admin_authenticated") === "true") {
       setIsAuthenticated(true);
     }
   }, []);
+
+  const handleRefreshClicks = async () => {
+    setRefreshingClicks(true);
+    try {
+      const res = await fetch("/api/clicks");
+      const clickRes = await res.json();
+      if (clickRes && clickRes.clicks) {
+        setData((prev) => {
+          const merged = prev.links.map((link) => {
+            const cloudVal = clickRes.clicks[link.id];
+            return typeof cloudVal === "number" ? { ...link, clicks: cloudVal } : link;
+          });
+          const updated = { ...prev, links: merged };
+          localStorage.setItem("dan1elcodm_links_data", JSON.stringify(updated));
+          return updated;
+        });
+      }
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setTimeout(() => setRefreshingClicks(false), 500);
+    }
+  };
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -380,37 +425,57 @@ export default function AdminPage() {
           {activeTab === "links" && (
             <div className="space-y-4">
               {/* Live Click Analytics Overview Banner (Black & White) */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 p-5 bg-white border border-neutral-200 rounded-2xl shadow-xs">
-                <div className="flex flex-col">
-                  <span className="text-[11px] uppercase tracking-wider font-bold text-neutral-500 flex items-center gap-1.5">
-                    <Flame className="w-3.5 h-3.5 text-black" />
-                    <span>Total Clicks (All)</span>
-                  </span>
-                  <span className="text-2xl font-black text-black mt-1">
-                    {totalClicks}
-                  </span>
+              <div className="bg-white border border-neutral-200 rounded-2xl p-5 shadow-xs space-y-4">
+                <div className="flex items-center justify-between pb-3 border-b border-neutral-100">
+                  <div>
+                    <h3 className="text-xs font-black uppercase tracking-wider text-black flex items-center gap-1.5">
+                      <Flame className="w-4 h-4 text-black" />
+                      <span>Live Cloud Click Analytics</span>
+                    </h3>
+                    <p className="text-[11px] text-neutral-500 font-medium mt-0.5">
+                      Tracks every visitor click in real time across TikTok and web.
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleRefreshClicks}
+                    className="flex items-center gap-1.5 px-3 py-1.5 bg-neutral-100 hover:bg-neutral-200 text-black text-xs font-bold rounded-xl transition-all shadow-xs"
+                    title="Fetch latest clicks from cloud"
+                  >
+                    <RefreshCw className={`w-3.5 h-3.5 ${refreshingClicks ? "animate-spin" : ""}`} />
+                    <span>{refreshingClicks ? "Syncing..." : "Sync Clicks"}</span>
+                  </button>
                 </div>
 
-                <div className="flex flex-col">
-                  <span className="text-[11px] uppercase tracking-wider font-bold text-neutral-500 flex items-center gap-1.5">
-                    <TrendingUp className="w-3.5 h-3.5 text-black" />
-                    <span>Top Performing Link</span>
-                  </span>
-                  <span className="text-sm font-bold text-black mt-1 truncate">
-                    {topLink && (topLink.clicks || 0) > 0
-                      ? `${topLink.title} (${topLink.clicks})`
-                      : "No clicks yet"}
-                  </span>
-                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div className="flex flex-col">
+                    <span className="text-[11px] uppercase tracking-wider font-bold text-neutral-500">
+                      Total Clicks (All)
+                    </span>
+                    <span className="text-2xl font-black text-black mt-1">
+                      {totalClicks}
+                    </span>
+                  </div>
 
-                <div className="flex flex-col">
-                  <span className="text-[11px] uppercase tracking-wider font-bold text-neutral-500 flex items-center gap-1.5">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-black" />
-                    <span>Active Bio Links</span>
-                  </span>
-                  <span className="text-2xl font-black text-black mt-1">
-                    {activeLinksCount} of {data.links.length}
-                  </span>
+                  <div className="flex flex-col">
+                    <span className="text-[11px] uppercase tracking-wider font-bold text-neutral-500">
+                      Top Performing Link
+                    </span>
+                    <span className="text-sm font-bold text-black mt-1 truncate">
+                      {topLink && (topLink.clicks || 0) > 0
+                        ? `${topLink.title} (${topLink.clicks})`
+                        : "No clicks yet"}
+                    </span>
+                  </div>
+
+                  <div className="flex flex-col">
+                    <span className="text-[11px] uppercase tracking-wider font-bold text-neutral-500">
+                      Active Bio Links
+                    </span>
+                    <span className="text-2xl font-black text-black mt-1">
+                      {activeLinksCount} of {data.links.length}
+                    </span>
+                  </div>
                 </div>
               </div>
 

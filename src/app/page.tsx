@@ -51,6 +51,24 @@ export default function HomePage() {
       })
       .catch((err) => console.log("Using cached data", err));
 
+    // 3. Fetch real-time cloud click analytics
+    fetch("/api/clicks")
+      .then((res) => res.json())
+      .then((clickRes) => {
+        if (clickRes && clickRes.clicks) {
+          setData((prev) => {
+            const merged = prev.links.map((link) => {
+              const cloudVal = clickRes.clicks[link.id];
+              return typeof cloudVal === "number" && cloudVal > (link.clicks || 0)
+                ? { ...link, clicks: cloudVal }
+                : link;
+            });
+            return { ...prev, links: merged };
+          });
+        }
+      })
+      .catch(() => {});
+
     // Close menu on outside click
     const handleClickOutside = (e: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
@@ -62,23 +80,28 @@ export default function HomePage() {
   }, []);
 
   const handleLinkClick = (id: string) => {
-    const updatedLinks = data.links.map((link) =>
-      link.id === id ? { ...link, clicks: (link.clicks || 0) + 1 } : link
-    );
-    const updated = {
-      ...data,
-      updatedAt: Date.now(),
-      links: updatedLinks,
-    };
-    setData(updated);
-    localStorage.setItem("dan1elcodm_links_data", JSON.stringify(updated));
+    // 1. Instant local increment
+    setData((prev) => {
+      const updatedLinks = prev.links.map((link) =>
+        link.id === id ? { ...link, clicks: (link.clicks || 0) + 1 } : link
+      );
+      const updated = {
+        ...prev,
+        links: updatedLinks,
+      };
+      localStorage.setItem("dan1elcodm_links_data", JSON.stringify(updated));
+      return updated;
+    });
 
-    // Fire background sync
-    fetch("/api/data", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(updated),
-    }).catch(() => {});
+    // 2. Reliable cloud hit increment
+    try {
+      const hitUrl = `/api/clicks?action=hit&id=${encodeURIComponent(id)}`;
+      if (typeof navigator !== "undefined" && navigator.sendBeacon) {
+        navigator.sendBeacon(hitUrl);
+      } else {
+        fetch(hitUrl, { method: "POST", keepalive: true }).catch(() => {});
+      }
+    } catch {}
   };
 
   const handleCopyLink = (e: React.MouseEvent, link: LinkItem) => {
@@ -152,6 +175,7 @@ export default function HomePage() {
               href={l.url}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={() => handleLinkClick(l.id)}
               title={l.title}
               className="w-10 h-10 rounded-2xl flex items-center justify-center shadow-xs hover:scale-110 active:scale-95 transition-all overflow-hidden"
             >
