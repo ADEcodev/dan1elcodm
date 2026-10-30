@@ -3,7 +3,6 @@
 import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
 import {
-  Share2,
   Check,
   MoreHorizontal,
   ExternalLink,
@@ -16,7 +15,6 @@ import { SiteData, LinkItem } from "@/types";
 
 export default function HomePage() {
   const [data, setData] = useState<SiteData>(defaultData as SiteData);
-  const [copied, setCopied] = useState(false);
   const [activeMenuId, setActiveMenuId] = useState<string | null>(null);
   const [copiedLinkId, setCopiedLinkId] = useState<string | null>(null);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -63,14 +61,6 @@ export default function HomePage() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const handleShare = () => {
-    if (navigator.clipboard) {
-      navigator.clipboard.writeText(window.location.origin);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    }
-  };
-
   const handleLinkClick = (id: string) => {
     const updatedLinks = data.links.map((link) =>
       link.id === id ? { ...link, clicks: (link.clicks || 0) + 1 } : link
@@ -115,30 +105,9 @@ export default function HomePage() {
   const activeLinks = data.links.filter((l) => l.active !== false);
 
   return (
-    <main className="min-h-screen bg-white text-neutral-900 flex flex-col items-center justify-between p-4 sm:p-6 font-sans">
-      {/* Top Header Bar */}
-      <div className="w-full max-w-xl flex items-center justify-end pt-2 pb-6">
-        <button
-          onClick={handleShare}
-          className="flex items-center gap-1.5 px-3.5 py-2 rounded-full text-xs font-semibold bg-white hover:bg-neutral-100 border border-neutral-300 text-black shadow-xs transition-all active:scale-95"
-          title="Share Profile"
-        >
-          {copied ? (
-            <>
-              <Check className="w-3.5 h-3.5 text-black stroke-[2.5]" />
-              <span className="text-black font-bold">Copied!</span>
-            </>
-          ) : (
-            <>
-              <Share2 className="w-3.5 h-3.5 text-black" />
-              <span>Share</span>
-            </>
-          )}
-        </button>
-      </div>
-
+    <main className="min-h-screen bg-white text-neutral-900 flex flex-col items-center pt-8 sm:pt-12 pb-10 px-4 sm:px-6 font-sans">
       {/* Profile Section (Pure Black & White Linktree Style) */}
-      <div className="w-full max-w-xl flex flex-col items-center text-center my-auto">
+      <div className="w-full max-w-xl flex flex-col items-center text-center">
         {/* Avatar */}
         <div className="relative mb-3.5">
           <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full overflow-hidden p-0.5 bg-white border-2 border-neutral-200 shadow-md">
@@ -266,7 +235,7 @@ export default function HomePage() {
       </div>
 
       {/* Footer */}
-      <footer className="w-full text-center text-xs text-neutral-400 py-6">
+      <footer className="w-full text-center text-xs text-neutral-400 pt-8 pb-4 mt-auto">
         <span>© {new Date().getFullYear()} {data.profile.name} • All Rights Reserved</span>
       </footer>
     </main>
