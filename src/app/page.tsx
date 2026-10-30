@@ -184,9 +184,9 @@ export default function HomePage() {
               target="_blank"
               rel="noopener noreferrer"
               title={l.title}
-              className="w-10 h-10 rounded-full bg-white border border-neutral-200 flex items-center justify-center p-2 shadow-xs hover:border-black hover:scale-105 active:scale-95 transition-all"
+              className="w-10 h-10 rounded-2xl flex items-center justify-center shadow-xs hover:scale-110 active:scale-95 transition-all overflow-hidden"
             >
-              <SocialIcon platform={l.platform} fallbackIcon={l.icon} className="w-5 h-5" />
+              <SocialIcon platform={l.platform} fallbackIcon={l.icon} className="w-full h-full" />
             </a>
           ))}
         </div>
@@ -203,8 +203,8 @@ export default function HomePage() {
                 className="linktree-card group flex items-center justify-between w-full p-3.5 sm:p-4 rounded-2xl bg-white border border-neutral-200 hover:border-black/40 shadow-[0_2px_8px_rgba(0,0,0,0.03)] text-neutral-900 cursor-pointer transition-all"
               >
                 {/* Left: Vector Icon */}
-                <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 overflow-hidden">
-                  <SocialIcon platform={link.platform} fallbackIcon={link.icon} className="w-9 h-9" />
+                <div className="w-11 h-11 rounded-xl flex items-center justify-center shrink-0 overflow-hidden">
+                  <SocialIcon platform={link.platform} fallbackIcon={link.icon} className="w-11 h-11" />
                 </div>
 
                 {/* Center: Title */}
@@ -220,7 +220,7 @@ export default function HomePage() {
                     e.stopPropagation();
                     setActiveMenuId(activeMenuId === link.id ? null : link.id);
                   }}
-                  className="w-10 h-10 rounded-xl flex items-center justify-center text-neutral-400 hover:text-black hover:bg-neutral-100 transition-colors shrink-0"
+                  className="w-11 h-11 rounded-xl flex items-center justify-center text-neutral-400 hover:text-black hover:bg-neutral-100 transition-colors shrink-0"
                   title="More options"
                 >
                   <MoreHorizontal className="w-5 h-5" />

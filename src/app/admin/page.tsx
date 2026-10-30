@@ -758,8 +758,8 @@ export default function AdminPage() {
               {/* Mini Social Icons Row */}
               <div className="flex items-center gap-1.5 mb-3">
                 {data.links.filter((l) => l.active).slice(0, 5).map((l) => (
-                  <div key={l.id} className="w-6 h-6 rounded-full bg-white border border-neutral-200 flex items-center justify-center p-1 shadow-xs overflow-hidden">
-                    <SocialIcon platform={l.platform} fallbackIcon={l.icon} className="w-4 h-4" />
+                  <div key={l.id} className="w-6 h-6 rounded-lg flex items-center justify-center shadow-xs overflow-hidden">
+                    <SocialIcon platform={l.platform} fallbackIcon={l.icon} className="w-full h-full" />
                   </div>
                 ))}
               </div>
@@ -773,7 +773,7 @@ export default function AdminPage() {
                       key={link.id}
                       className="flex items-center justify-between p-2.5 rounded-xl border border-neutral-200 bg-white shadow-xs text-neutral-900 text-[11px] font-bold"
                     >
-                      <div className="w-6 h-6 rounded-lg flex items-center justify-center shrink-0 overflow-hidden">
+                      <div className="w-6 h-6 rounded-md flex items-center justify-center shrink-0 overflow-hidden">
                         <SocialIcon platform={link.platform} fallbackIcon={link.icon} className="w-6 h-6" />
                       </div>
                       <span className="flex-1 text-center px-1 truncate font-bold text-black">{link.title}</span>
