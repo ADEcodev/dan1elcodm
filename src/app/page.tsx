@@ -5,7 +5,6 @@ import Link from "next/link";
 import {
   CheckCircle2,
   Share2,
-  Lock,
   Check,
   MoreHorizontal,
   ExternalLink
@@ -174,17 +173,8 @@ export default function HomePage() {
       </div>
 
       {/* Footer */}
-      <footer className="w-full text-center text-xs text-neutral-400 py-6 flex items-center justify-center gap-2">
-        <span>{data.profile.name}</span>
-        <span>•</span>
-        <Link
-          href="/admin"
-          className="hover:text-neutral-600 transition-colors flex items-center gap-1"
-          title="Admin Panel"
-        >
-          <Lock className="w-3 h-3" />
-          <span>Admin</span>
-        </Link>
+      <footer className="w-full text-center text-xs text-neutral-400 py-6">
+        <span>© {new Date().getFullYear()} {data.profile.name} • All Rights Reserved</span>
       </footer>
     </main>
   );

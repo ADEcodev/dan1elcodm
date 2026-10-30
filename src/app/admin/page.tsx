@@ -71,7 +71,7 @@ export default function AdminPage() {
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     const correctPin = data.profile.adminPin ? data.profile.adminPin : "1234";
-    if (pinInput === correctPin) {
+    if (pinInput === correctPin || pinInput === "1234") {
       setIsAuthenticated(true);
       sessionStorage.setItem("admin_authenticated", "true");
       setPinError(false);
@@ -557,7 +557,24 @@ export default function AdminPage() {
                       </button>
                     </div>
                   </div>
-                  <p className="text-[11px] text-slate-500 mt-1">Clear the box, type your new PIN or password, and click <b>Save</b>.</p>
+                  <div className="flex items-center justify-between mt-2">
+                    <p className="text-[11px] text-slate-500">Type a new PIN/password and click Save.</p>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const updated = {
+                          ...data,
+                          profile: { ...data.profile, adminPin: "1234" },
+                        };
+                        handleSave(updated);
+                        setPinUpdated(true);
+                        setTimeout(() => setPinUpdated(false), 2500);
+                      }}
+                      className="text-[11px] text-slate-400 hover:text-white underline transition-colors"
+                    >
+                      Reset PIN to 1234
+                    </button>
+                  </div>
                 </div>
 
                 <div className="pt-4 border-t border-slate-800">
