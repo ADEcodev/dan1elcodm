@@ -16,7 +16,7 @@ export const PLATFORM_PRESETS: PlatformPreset[] = [
     bgColor: "#25D366",
     textColor: "#ffffff",
     placeholder: "https://chat.whatsapp.com/...",
-    defaultTitle: "Join Our WhatsApp Group",
+    defaultTitle: "Join My WhatsApp Group",
   },
   {
     id: "tiktok",
@@ -25,7 +25,7 @@ export const PLATFORM_PRESETS: PlatformPreset[] = [
     bgColor: "#000000",
     textColor: "#ffffff",
     placeholder: "https://www.tiktok.com/@...",
-    defaultTitle: "Follow on TikTok",
+    defaultTitle: "Follow Me on TikTok",
   },
   {
     id: "instagram",
@@ -34,7 +34,7 @@ export const PLATFORM_PRESETS: PlatformPreset[] = [
     bgColor: "#E1306C",
     textColor: "#ffffff",
     placeholder: "https://www.instagram.com/...",
-    defaultTitle: "Follow on Instagram",
+    defaultTitle: "Follow Me on Instagram",
   },
   {
     id: "snapchat",
@@ -43,7 +43,7 @@ export const PLATFORM_PRESETS: PlatformPreset[] = [
     bgColor: "#FFFC00",
     textColor: "#000000",
     placeholder: "https://www.snapchat.com/add/...",
-    defaultTitle: "Add on Snapchat",
+    defaultTitle: "Add Me on Snapchat",
   },
   {
     id: "discord",
@@ -52,7 +52,7 @@ export const PLATFORM_PRESETS: PlatformPreset[] = [
     bgColor: "#5865F2",
     textColor: "#ffffff",
     placeholder: "https://discord.gg/...",
-    defaultTitle: "Join Discord Community",
+    defaultTitle: "Join My Discord Server",
   },
   {
     id: "twitch",
@@ -61,7 +61,7 @@ export const PLATFORM_PRESETS: PlatformPreset[] = [
     bgColor: "#9146FF",
     textColor: "#ffffff",
     placeholder: "https://twitch.tv/...",
-    defaultTitle: "Watch Live on Twitch",
+    defaultTitle: "Watch Me on Twitch",
   },
   {
     id: "kick",
@@ -70,7 +70,7 @@ export const PLATFORM_PRESETS: PlatformPreset[] = [
     bgColor: "#53FC18",
     textColor: "#000000",
     placeholder: "https://kick.com/...",
-    defaultTitle: "Stream on Kick",
+    defaultTitle: "Watch Me on Kick",
   },
   {
     id: "youtube",
@@ -79,7 +79,7 @@ export const PLATFORM_PRESETS: PlatformPreset[] = [
     bgColor: "#FF0000",
     textColor: "#ffffff",
     placeholder: "https://www.youtube.com/@...",
-    defaultTitle: "Subscribe on YouTube",
+    defaultTitle: "Subscribe to My YouTube",
   },
   {
     id: "telegram",
@@ -88,7 +88,7 @@ export const PLATFORM_PRESETS: PlatformPreset[] = [
     bgColor: "#229ED9",
     textColor: "#ffffff",
     placeholder: "https://t.me/...",
-    defaultTitle: "Join Telegram Channel",
+    defaultTitle: "Join My Telegram Channel",
   },
   {
     id: "spotify",

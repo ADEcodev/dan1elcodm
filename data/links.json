@@ -2,7 +2,7 @@
   "profile": {
     "name": "Dan1elcodm",
     "handle": "@dan1el_codm",
-    "bio": "Welcome to my official links! Join our WhatsApp community & connect below 👇",
+    "bio": "Welcome to my official links! Join my WhatsApp community & connect below 👇",
     "avatar": "/images/avatar.png",
     "verified": true,
     "theme": "midnight",
@@ -11,7 +11,7 @@
   "links": [
     {
       "id": "whatsapp-1",
-      "title": "Join Our WhatsApp Group",
+      "title": "Join My WhatsApp Group",
       "url": "https://chat.whatsapp.com/LDofjM3k9yrKleXtjYnM1Z?s=cl&p=i&mlu=4&ilr=4&iam=2",
       "platform": "whatsapp",
       "icon": "/images/icons/whatsapp.svg",
@@ -22,7 +22,7 @@
     },
     {
       "id": "tiktok-1",
-      "title": "Follow on TikTok",
+      "title": "Follow Me on TikTok",
       "url": "https://www.tiktok.com/@dan1el_codm",
       "platform": "tiktok",
       "icon": "/images/icons/tiktok.svg",
@@ -33,7 +33,7 @@
     },
     {
       "id": "instagram-1",
-      "title": "Follow on Instagram",
+      "title": "Follow Me on Instagram",
       "url": "https://www.instagram.com/dan1elcodm",
       "platform": "instagram",
       "icon": "/images/icons/instagram.svg",
@@ -44,7 +44,7 @@
     },
     {
       "id": "snapchat-1",
-      "title": "Add on Snapchat",
+      "title": "Add Me on Snapchat",
       "url": "https://www.snapchat.com/add/dan1el_codm",
       "platform": "snapchat",
       "icon": "/images/icons/snapchat.svg",
