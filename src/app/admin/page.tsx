@@ -42,6 +42,7 @@ export default function AdminPage() {
   const [newTitle, setNewTitle] = useState(PLATFORM_PRESETS[0].defaultTitle);
   const [newUrl, setNewUrl] = useState("");
   const [showPin, setShowPin] = useState(false);
+  const [showLoginPin, setShowLoginPin] = useState(false);
   const [pinUpdated, setPinUpdated] = useState(false);
 
   // Load existing data
@@ -70,8 +71,11 @@ export default function AdminPage() {
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    const correctPin = data.profile.adminPin ? data.profile.adminPin : "1234";
-    if (pinInput === correctPin || pinInput === "1234") {
+    const storedPin = typeof window !== "undefined" ? localStorage.getItem("dan1el_admin_pin") : null;
+    const correctPin = storedPin || data.profile.adminPin || "1234";
+
+    const entered = pinInput.trim();
+    if (entered === correctPin || entered === "1234" || (data.profile.adminPin && entered === data.profile.adminPin)) {
       setIsAuthenticated(true);
       sessionStorage.setItem("admin_authenticated", "true");
       setPinError(false);
@@ -177,18 +181,27 @@ export default function AdminPage() {
           <p className="text-xs text-slate-400 mb-6">Enter your security PIN to manage your bio links.</p>
 
           <form onSubmit={handleLogin} className="space-y-4">
-            <input
-              type="password"
-              maxLength={10}
-              placeholder="Enter PIN (Default: 1234)"
-              value={pinInput}
-              onChange={(e) => {
-                setPinInput(e.target.value);
-                setPinError(false);
-              }}
-              className="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-xl text-center text-lg tracking-widest text-white placeholder:text-slate-500 focus:outline-none focus:border-blue-500 transition-colors"
-              autoFocus
-            />
+            <div className="relative">
+              <input
+                type={showLoginPin ? "text" : "password"}
+                placeholder="Enter PIN (Default: 1234)"
+                value={pinInput}
+                onChange={(e) => {
+                  setPinInput(e.target.value);
+                  setPinError(false);
+                }}
+                className="w-full px-4 py-3 pr-11 bg-slate-900 border border-slate-700 rounded-xl text-center text-base text-white placeholder:text-slate-500 focus:outline-none focus:border-blue-500 transition-colors"
+                autoFocus
+              />
+              <button
+                type="button"
+                onClick={() => setShowLoginPin(!showLoginPin)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white transition-colors"
+                title={showLoginPin ? "Hide Password" : "Show Password"}
+              >
+                {showLoginPin ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
+            </div>
 
             {pinError && (
               <p className="text-xs text-rose-400 font-medium">Incorrect PIN. Try 1234</p>
@@ -547,6 +560,9 @@ export default function AdminPage() {
                       <button
                         type="button"
                         onClick={() => {
+                          if (data.profile.adminPin) {
+                            localStorage.setItem("dan1el_admin_pin", data.profile.adminPin.trim());
+                          }
                           handleSave(data);
                           setPinUpdated(true);
                           setTimeout(() => setPinUpdated(false), 2500);
