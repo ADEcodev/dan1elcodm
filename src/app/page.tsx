@@ -3,7 +3,6 @@
 import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
 import {
-  CheckCircle2,
   Share2,
   Check,
   MoreHorizontal,
@@ -25,21 +24,31 @@ export default function HomePage() {
   useEffect(() => {
     // 1. Instant local reactive state
     const saved = localStorage.getItem("dan1elcodm_links_data");
+    let localData: SiteData | null = null;
     if (saved) {
       try {
-        setData(JSON.parse(saved));
+        localData = JSON.parse(saved);
+        if (localData && localData.profile) {
+          setData(localData);
+        }
       } catch (e) {
         console.error(e);
       }
     }
 
-    // 2. Fetch server data
+    // 2. Fetch server data with timestamp guard
     fetch("/api/data")
       .then((res) => res.json())
       .then((serverData) => {
         if (serverData && serverData.profile) {
-          setData(serverData);
-          localStorage.setItem("dan1elcodm_links_data", JSON.stringify(serverData));
+          const localTime = (localData as any)?.updatedAt || 0;
+          const serverTime = (serverData as any)?.updatedAt || 0;
+
+          // Only overwrite if server is strictly newer or no valid local data exists
+          if (!localData || serverTime > localTime) {
+            setData(serverData);
+            localStorage.setItem("dan1elcodm_links_data", JSON.stringify(serverData));
+          }
         }
       })
       .catch((err) => console.log("Using cached data", err));
@@ -66,7 +75,11 @@ export default function HomePage() {
     const updatedLinks = data.links.map((link) =>
       link.id === id ? { ...link, clicks: (link.clicks || 0) + 1 } : link
     );
-    const updated = { ...data, links: updatedLinks };
+    const updated = {
+      ...data,
+      updatedAt: Date.now(),
+      links: updatedLinks,
+    };
     setData(updated);
     localStorage.setItem("dan1elcodm_links_data", JSON.stringify(updated));
 
@@ -102,33 +115,33 @@ export default function HomePage() {
   const activeLinks = data.links.filter((l) => l.active !== false);
 
   return (
-    <main className="min-h-screen bg-[#f5f6f8] text-neutral-900 flex flex-col items-center justify-between p-4 sm:p-6 font-sans">
+    <main className="min-h-screen bg-white text-neutral-900 flex flex-col items-center justify-between p-4 sm:p-6 font-sans">
       {/* Top Header Bar */}
       <div className="w-full max-w-xl flex items-center justify-end pt-2 pb-6">
         <button
           onClick={handleShare}
-          className="flex items-center gap-1.5 px-3.5 py-2 rounded-full text-xs font-semibold bg-white hover:bg-neutral-50 border border-neutral-200/90 text-neutral-700 shadow-sm transition-all active:scale-95"
+          className="flex items-center gap-1.5 px-3.5 py-2 rounded-full text-xs font-semibold bg-white hover:bg-neutral-100 border border-neutral-300 text-black shadow-xs transition-all active:scale-95"
           title="Share Profile"
         >
           {copied ? (
             <>
-              <Check className="w-3.5 h-3.5 text-emerald-600" />
-              <span className="text-emerald-600">Copied!</span>
+              <Check className="w-3.5 h-3.5 text-black stroke-[2.5]" />
+              <span className="text-black font-bold">Copied!</span>
             </>
           ) : (
             <>
-              <Share2 className="w-3.5 h-3.5" />
+              <Share2 className="w-3.5 h-3.5 text-black" />
               <span>Share</span>
             </>
           )}
         </button>
       </div>
 
-      {/* Profile Section (Pure Linktree Style) */}
+      {/* Profile Section (Pure Black & White Linktree Style) */}
       <div className="w-full max-w-xl flex flex-col items-center text-center my-auto">
         {/* Avatar */}
         <div className="relative mb-3.5">
-          <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full overflow-hidden p-0.5 bg-white border-2 border-white shadow-md">
+          <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full overflow-hidden p-0.5 bg-white border-2 border-neutral-200 shadow-md">
             <img
               src={data.profile.avatar || "/images/avatar.png"}
               alt={data.profile.name}
@@ -137,32 +150,32 @@ export default function HomePage() {
           </div>
           {data.profile.verified && (
             <div
-              className="absolute bottom-0 right-1 bg-blue-500 rounded-full p-1 border-2 border-white shadow-sm"
+              className="absolute bottom-0 right-1 bg-black rounded-full p-1 border-2 border-white shadow-xs flex items-center justify-center"
               title="Verified Creator"
             >
-              <CheckCircle2 className="w-4 h-4 text-white fill-white" />
+              <Check className="w-3.5 h-3.5 text-white stroke-[3]" />
             </div>
           )}
         </div>
 
         {/* Name */}
-        <h1 className="text-xl sm:text-2xl font-bold text-neutral-900 tracking-tight flex items-center justify-center gap-1.5">
+        <h1 className="text-xl sm:text-2xl font-black text-black tracking-tight flex items-center justify-center gap-1.5">
           {data.profile.name}
         </h1>
 
         {/* Handle */}
-        <p className="text-sm font-medium text-neutral-500 mt-0.5">
+        <p className="text-sm font-semibold text-neutral-500 mt-0.5">
           {data.profile.handle}
         </p>
 
-        {/* Bio */}
+        {/* Welcome Message / Bio (With line breaks preserved) */}
         {data.profile.bio && (
-          <p className="text-sm text-neutral-600 max-w-md mt-2.5 leading-relaxed px-4">
+          <p className="text-sm font-medium text-neutral-700 max-w-md mt-3 leading-relaxed px-4 whitespace-pre-line">
             {data.profile.bio}
           </p>
         )}
 
-        {/* Social Icons Bar (Authentic Linktree header icons with vector SVGs) */}
+        {/* Social Icons Bar (Header vector icons) */}
         <div className="flex items-center gap-3 my-5">
           {activeLinks.map((l) => (
             <a
@@ -171,14 +184,14 @@ export default function HomePage() {
               target="_blank"
               rel="noopener noreferrer"
               title={l.title}
-              className="w-10 h-10 rounded-full bg-white border border-neutral-200/90 flex items-center justify-center p-2 shadow-xs hover:shadow-md hover:scale-110 active:scale-95 transition-all"
+              className="w-10 h-10 rounded-full bg-white border border-neutral-200 flex items-center justify-center p-2 shadow-xs hover:border-black hover:scale-105 active:scale-95 transition-all"
             >
               <SocialIcon platform={l.platform} fallbackIcon={l.icon} className="w-5 h-5" />
             </a>
           ))}
         </div>
 
-        {/* Links Cards (Clean White Linktree Pills) */}
+        {/* Links Cards (Clean Black & White Linktree Pills) */}
         <div className="w-full space-y-3.5 px-2 relative" ref={menuRef}>
           {activeLinks.map((link) => (
             <div key={link.id} className="relative">
@@ -187,15 +200,15 @@ export default function HomePage() {
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => handleLinkClick(link.id)}
-                className="linktree-card group flex items-center justify-between w-full p-3.5 sm:p-4 rounded-2xl bg-white border border-neutral-200/90 shadow-[0_2px_8px_rgba(0,0,0,0.04)] text-neutral-900 cursor-pointer"
+                className="linktree-card group flex items-center justify-between w-full p-3.5 sm:p-4 rounded-2xl bg-white border border-neutral-200 hover:border-black/40 shadow-[0_2px_8px_rgba(0,0,0,0.03)] text-neutral-900 cursor-pointer transition-all"
               >
-                {/* Left: Official Vector Icon */}
+                {/* Left: Vector Icon */}
                 <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 overflow-hidden">
                   <SocialIcon platform={link.platform} fallbackIcon={link.icon} className="w-9 h-9" />
                 </div>
 
                 {/* Center: Title */}
-                <div className="flex-1 text-center font-semibold text-sm sm:text-base text-neutral-900 px-3 tracking-tight truncate">
+                <div className="flex-1 text-center font-bold text-sm sm:text-base text-black px-3 tracking-tight truncate">
                   {link.title}
                 </div>
 
@@ -207,7 +220,7 @@ export default function HomePage() {
                     e.stopPropagation();
                     setActiveMenuId(activeMenuId === link.id ? null : link.id);
                   }}
-                  className="w-10 h-10 rounded-xl flex items-center justify-center text-neutral-400 hover:text-neutral-900 hover:bg-neutral-100 transition-colors shrink-0"
+                  className="w-10 h-10 rounded-xl flex items-center justify-center text-neutral-400 hover:text-black hover:bg-neutral-100 transition-colors shrink-0"
                   title="More options"
                 >
                   <MoreHorizontal className="w-5 h-5" />
@@ -221,12 +234,12 @@ export default function HomePage() {
                   <button
                     type="button"
                     onClick={(e) => handleCopyLink(e, link)}
-                    className="w-full px-3.5 py-2.5 text-xs font-semibold text-neutral-700 hover:bg-neutral-50 flex items-center gap-2.5 transition-colors"
+                    className="w-full px-3.5 py-2.5 text-xs font-semibold text-neutral-800 hover:bg-neutral-100 flex items-center gap-2.5 transition-colors"
                   >
                     {copiedLinkId === link.id ? (
                       <>
-                        <Check className="w-4 h-4 text-emerald-600" />
-                        <span className="text-emerald-600 font-bold">Link Copied!</span>
+                        <Check className="w-4 h-4 text-black stroke-[2.5]" />
+                        <span className="text-black font-bold">Link Copied!</span>
                       </>
                     ) : (
                       <>
@@ -240,7 +253,7 @@ export default function HomePage() {
                   <button
                     type="button"
                     onClick={(e) => handleOpenBrowser(e, link)}
-                    className="w-full px-3.5 py-2.5 text-xs font-semibold text-neutral-700 hover:bg-neutral-50 flex items-center gap-2.5 transition-colors border-t border-neutral-100"
+                    className="w-full px-3.5 py-2.5 text-xs font-semibold text-neutral-800 hover:bg-neutral-100 flex items-center gap-2.5 transition-colors border-t border-neutral-100"
                   >
                     <Globe className="w-4 h-4 text-neutral-500" />
                     <span>Open in Browser</span>

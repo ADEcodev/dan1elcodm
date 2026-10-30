@@ -16,12 +16,12 @@ export interface ProfileData {
   bio: string;
   avatar: string;
   verified: boolean;
-  theme: "midnight" | "amoled" | "cyberpunk" | "sunset" | "minimal";
+  theme?: string;
   adminPin: string;
 }
 
 export interface SiteData {
   profile: ProfileData;
   links: LinkItem[];
+  updatedAt?: number;
 }
-

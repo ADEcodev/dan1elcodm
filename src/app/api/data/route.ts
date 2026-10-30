@@ -5,28 +5,37 @@ import defaultData from "../../../../data/links.json";
 
 const dataFilePath = path.join(process.cwd(), "data", "links.json");
 
+// In-memory cache for serverless environments (Vercel)
+let inMemoryData: any = null;
+
 export async function GET() {
   try {
+    if (inMemoryData) {
+      return NextResponse.json(inMemoryData);
+    }
     if (fs.existsSync(dataFilePath)) {
       const fileData = fs.readFileSync(dataFilePath, "utf8");
-      return NextResponse.json(JSON.parse(fileData));
+      const parsed = JSON.parse(fileData);
+      inMemoryData = parsed;
+      return NextResponse.json(parsed);
     }
     return NextResponse.json(defaultData);
   } catch (error) {
-    return NextResponse.json(defaultData);
+    return NextResponse.json(inMemoryData || defaultData);
   }
 }
 
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    
+    body.updatedAt = Date.now();
+    inMemoryData = body;
+
     // Attempt to write to file if supported
     try {
       fs.writeFileSync(dataFilePath, JSON.stringify(body, null, 2), "utf8");
     } catch (fsErr) {
-      // In serverless environments with read-only file systems, writeFileSync may fail gracefully
-      console.warn("Could not write to local file system (expected on serverless):", fsErr);
+      console.warn("Could not write to local file system (read-only on serverless):", fsErr);
     }
 
     return NextResponse.json({ success: true, data: body });
@@ -37,4 +46,3 @@ export async function POST(request: Request) {
     );
   }
 }
-
