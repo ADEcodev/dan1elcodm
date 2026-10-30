@@ -625,33 +625,55 @@ export default function AdminPage() {
                 </p>
               )}
 
-              {/* Links List */}
+              {/* Bento Preview */}
               <div className="w-full space-y-2 mt-1">
+                {/* Hero WhatsApp card if active */}
                 {data.links
-                  .filter((l) => l.active)
+                  .filter((l) => l.active && l.platform === "whatsapp")
                   .map((link) => (
                     <div
                       key={link.id}
-                      style={{
-                        backgroundColor: link.bgColor ? `${link.bgColor}20` : undefined,
-                        borderColor: link.bgColor ? `${link.bgColor}50` : undefined,
-                      }}
-                      className="flex items-center justify-between p-2 rounded-xl border bg-slate-900/80 text-white text-[11px] font-semibold"
+                      className="p-2.5 rounded-2xl border border-emerald-500/30 bg-emerald-950/40 flex items-center justify-between text-white text-[11px] font-bold shadow-md"
                     >
-                      <div
-                        className="w-6 h-6 rounded-lg flex items-center justify-center shrink-0 overflow-hidden"
-                        style={{ backgroundColor: link.bgColor || "#1e293b" }}
-                      >
-                        {link.icon ? (
-                          <img src={link.icon} alt={link.title} className="w-3.5 h-3.5 object-contain" />
-                        ) : (
-                          <ExternalLink className="w-3 h-3 text-white" />
-                        )}
+                      <div className="flex items-center gap-2 truncate">
+                        <div className="w-7 h-7 rounded-xl bg-[#25D366] flex items-center justify-center shrink-0 p-1">
+                          <img src={link.icon || "/images/icons/whatsapp.svg"} alt="WA" className="w-full h-full object-contain" />
+                        </div>
+                        <div className="truncate">
+                          <p className="truncate text-emerald-300">{link.title}</p>
+                          <span className="text-[9px] text-emerald-400/80 font-normal">VIP Community</span>
+                        </div>
                       </div>
-                      <span className="flex-1 text-center px-1 truncate">{link.title}</span>
-                      <ExternalLink className="w-3 h-3 text-slate-400 shrink-0" />
+                      <ExternalLink className="w-3 h-3 text-emerald-400 shrink-0" />
                     </div>
                   ))}
+
+                {/* 2-Column Bento Grid for Other Socials */}
+                <div className="grid grid-cols-2 gap-2 pt-0.5">
+                  {data.links
+                    .filter((l) => l.active && l.platform !== "whatsapp")
+                    .map((link) => (
+                      <div
+                        key={link.id}
+                        style={{
+                          backgroundColor: link.bgColor ? `${link.bgColor}15` : undefined,
+                          borderColor: link.bgColor ? `${link.bgColor}40` : undefined,
+                        }}
+                        className="p-2 rounded-xl border bg-slate-900/90 text-white flex flex-col justify-between h-20 shadow-sm"
+                      >
+                        <div className="flex items-center justify-between">
+                          <div
+                            className="w-5 h-5 rounded-lg flex items-center justify-center p-1"
+                            style={{ backgroundColor: link.bgColor || "#1e293b" }}
+                          >
+                            <img src={link.icon} alt={link.title} className="w-full h-full object-contain" />
+                          </div>
+                          <ExternalLink className="w-2.5 h-2.5 text-slate-400" />
+                        </div>
+                        <span className="text-[10px] font-bold truncate line-clamp-1">{link.title}</span>
+                      </div>
+                    ))}
+                </div>
               </div>
             </div>
           </div>
