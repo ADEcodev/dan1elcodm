@@ -11,12 +11,12 @@ export interface PlatformPreset {
 export const PLATFORM_PRESETS: PlatformPreset[] = [
   {
     id: "whatsapp",
-    name: "WhatsApp Group",
+    name: "WhatsApp Community",
     icon: "/images/icons/whatsapp.svg",
     bgColor: "#25D366",
     textColor: "#ffffff",
     placeholder: "https://chat.whatsapp.com/...",
-    defaultTitle: "Join My WhatsApp Group",
+    defaultTitle: "Join My WhatsApp Community",
   },
   {
     id: "tiktok",
