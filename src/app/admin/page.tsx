@@ -11,27 +11,21 @@ import {
   Trash2,
   Eye,
   EyeOff,
-  ExternalLink,
   Save,
   CheckCircle2,
-  Palette,
   User,
   Settings,
   Sparkles,
   Smartphone,
-  ChevronRight,
   LogOut,
-  RefreshCw,
-  Copy,
-  Check,
-  MoreHorizontal,
   Flame,
-  TrendingUp
+  TrendingUp,
+  MoreHorizontal
 } from "lucide-react";
 import { SocialIcon } from "@/components/SocialIcon";
 import defaultData from "../../../data/links.json";
 import { PLATFORM_PRESETS, PlatformPreset } from "@/utils/platforms";
-import { SiteData, LinkItem, ProfileData } from "@/types";
+import { SiteData, LinkItem } from "@/types";
 
 export default function AdminPage() {
   const [data, setData] = useState<SiteData>(defaultData as SiteData);
@@ -82,7 +76,7 @@ export default function AdminPage() {
       entered === correctPin ||
       entered === "Apple2003@" ||
       entered === "1234" ||
-      (data.profile.adminPin && entered === data.profile.adminPin)
+      (data.profile.adminPin && entered === data.profile.adminPin.trim())
     ) {
       setIsAuthenticated(true);
       sessionStorage.setItem("admin_authenticated", "true");
@@ -177,16 +171,16 @@ export default function AdminPage() {
     setNewTitle(found.defaultTitle);
   };
 
-  // Login Screen
+  // Login Screen (Pure White Light Mode)
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen bg-slate-950 text-white flex flex-col items-center justify-center p-4">
-        <div className="w-full max-w-sm glass-panel p-8 rounded-3xl text-center shadow-2xl border border-slate-800">
-          <div className="w-16 h-16 bg-blue-500/10 border border-blue-500/20 text-blue-400 rounded-2xl flex items-center justify-center mx-auto mb-5 shadow-inner">
-            <Lock className="w-8 h-8" />
+      <div className="min-h-screen bg-[#f5f6f8] text-neutral-900 flex flex-col items-center justify-center p-4 font-sans">
+        <div className="w-full max-w-sm bg-white p-8 rounded-3xl text-center shadow-[0_4px_24px_rgba(0,0,0,0.06)] border border-neutral-200/90">
+          <div className="w-14 h-14 bg-neutral-100 border border-neutral-200 text-neutral-800 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-xs">
+            <Lock className="w-6 h-6" />
           </div>
-          <h1 className="text-xl font-bold mb-1.5">Dan1elcodm Admin</h1>
-          <p className="text-xs text-slate-400 mb-6">Enter your security PIN to manage your bio links.</p>
+          <h1 className="text-xl font-bold text-neutral-900 mb-1">Dan1elcodm Admin</h1>
+          <p className="text-xs text-neutral-500 mb-6">Enter your security password to manage your bio links.</p>
 
           <form onSubmit={handleLogin} className="space-y-4">
             <div className="relative">
@@ -198,13 +192,13 @@ export default function AdminPage() {
                   setPinInput(e.target.value);
                   setPinError(false);
                 }}
-                className="w-full px-4 py-3 pr-11 bg-slate-900 border border-slate-700 rounded-xl text-center text-base text-white placeholder:text-slate-500 focus:outline-none focus:border-blue-500 transition-colors"
+                className="w-full px-4 py-3 pr-11 bg-white border border-neutral-300 rounded-xl text-center text-base text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900 transition-all shadow-xs"
                 autoFocus
               />
               <button
                 type="button"
                 onClick={() => setShowLoginPin(!showLoginPin)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white transition-colors"
+                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-700 transition-colors"
                 title={showLoginPin ? "Hide Password" : "Show Password"}
               >
                 {showLoginPin ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -212,20 +206,20 @@ export default function AdminPage() {
             </div>
 
             {pinError && (
-              <p className="text-xs text-rose-400 font-medium">Incorrect password. Please try again.</p>
+              <p className="text-xs text-rose-600 font-semibold">Incorrect password. Please try again.</p>
             )}
 
             <button
               type="submit"
-              className="w-full py-3 bg-blue-600 hover:bg-blue-500 active:scale-[0.98] text-white font-semibold rounded-xl transition-all shadow-lg shadow-blue-600/30 text-sm flex items-center justify-center gap-2"
+              className="w-full py-3 bg-neutral-900 hover:bg-neutral-800 active:scale-[0.99] text-white font-semibold rounded-xl transition-all shadow-sm text-sm flex items-center justify-center gap-2"
             >
               <Unlock className="w-4 h-4" />
               <span>Unlock Dashboard</span>
             </button>
           </form>
 
-          <div className="mt-6 pt-5 border-t border-slate-800 text-xs text-slate-500">
-            <Link href="/" className="hover:text-slate-300 transition-colors flex items-center justify-center gap-1">
+          <div className="mt-6 pt-5 border-t border-neutral-100 text-xs text-neutral-500">
+            <Link href="/" className="hover:text-neutral-900 transition-colors flex items-center justify-center gap-1">
               <span>← Back to public link page</span>
             </Link>
           </div>
@@ -234,35 +228,36 @@ export default function AdminPage() {
     );
   }
 
-  // Themes list
-  const themes = [
-    { id: "midnight", name: "Midnight Glass", bg: "from-slate-950 via-slate-900 to-indigo-950", border: "border-indigo-500" },
-    { id: "amoled", name: "AMOLED Pure Black", bg: "bg-black", border: "border-neutral-500" },
-    { id: "cyberpunk", name: "Cyberpunk Neon", bg: "from-purple-950 via-slate-950 to-pink-950", border: "border-fuchsia-500" },
-    { id: "sunset", name: "Sunset Ember", bg: "from-stone-950 via-red-950 to-amber-950", border: "border-amber-500" },
-    { id: "minimal", name: "Clean Minimal", bg: "bg-zinc-950", border: "border-zinc-500" },
-  ];
+  const totalClicks = data.links.reduce((acc, l) => acc + (l.clicks || 0), 0);
+  const activeLinksCount = data.links.filter((l) => l.active).length;
+  const topLink = [...data.links].sort((a, b) => (b.clicks || 0) - (a.clicks || 0))[0];
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col">
+    <div className="min-h-screen bg-[#f5f6f8] text-neutral-900 flex flex-col font-sans">
       {/* Top Navigation */}
-      <header className="border-b border-slate-800/80 bg-slate-900/60 backdrop-blur-md sticky top-0 z-30 px-4 sm:px-8 py-3.5 flex items-center justify-between">
+      <header className="border-b border-neutral-200/90 bg-white/90 backdrop-blur-md sticky top-0 z-30 px-4 sm:px-8 py-3.5 flex items-center justify-between shadow-xs">
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center shadow-md">
-            <Sparkles className="w-5 h-5 text-white" />
+          <div className="w-9 h-9 rounded-xl overflow-hidden border border-neutral-200 shadow-xs">
+            <img
+              src={data.profile.avatar || "/images/avatar.png"}
+              alt={data.profile.name}
+              className="w-full h-full object-cover"
+            />
           </div>
           <div>
-            <h1 className="text-sm font-bold text-white flex items-center gap-1.5">
-              <span>Dan1elcodm</span>
-              <span className="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-400 font-semibold border border-blue-500/30">Admin Hub</span>
+            <h1 className="text-sm font-bold text-neutral-900 flex items-center gap-2">
+              <span>{data.profile.name}</span>
+              <span className="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full bg-neutral-100 text-neutral-700 font-bold border border-neutral-200">
+                Admin Hub
+              </span>
             </h1>
           </div>
         </div>
 
         <div className="flex items-center gap-3">
           {saveSuccess && (
-            <div className="flex items-center gap-1.5 text-xs text-emerald-400 font-medium bg-emerald-500/10 border border-emerald-500/20 px-3 py-1.5 rounded-full animate-fade-in">
-              <CheckCircle2 className="w-3.5 h-3.5" />
+            <div className="flex items-center gap-1.5 text-xs text-emerald-700 font-semibold bg-emerald-50 border border-emerald-200 px-3 py-1.5 rounded-full animate-fade-in">
+              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
               <span>Saved!</span>
             </div>
           )}
@@ -270,7 +265,7 @@ export default function AdminPage() {
           <Link
             href="/"
             target="_blank"
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition-all"
+            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-white hover:bg-neutral-50 text-neutral-700 border border-neutral-200 shadow-xs transition-all"
           >
             <Eye className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">View Live Site</span>
@@ -278,7 +273,7 @@ export default function AdminPage() {
 
           <button
             onClick={handleLogout}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 transition-colors"
+            className="p-2 rounded-xl text-neutral-400 hover:text-rose-600 hover:bg-rose-50 transition-colors"
             title="Log Out"
           >
             <LogOut className="w-4 h-4" />
@@ -291,13 +286,13 @@ export default function AdminPage() {
         {/* Left Column: Management Tabs & Forms (Cols 7) */}
         <div className="lg:col-span-7 space-y-6">
           {/* Navigation Tabs */}
-          <div className="flex items-center gap-2 p-1 bg-slate-900 border border-slate-800 rounded-xl">
+          <div className="flex items-center gap-1.5 p-1.5 bg-neutral-200/70 border border-neutral-200/80 rounded-2xl">
             <button
               onClick={() => setActiveTab("links")}
-              className={`flex-1 py-2 text-xs font-semibold rounded-lg flex items-center justify-center gap-2 transition-all ${
+              className={`flex-1 py-2 text-xs font-semibold rounded-xl flex items-center justify-center gap-2 transition-all ${
                 activeTab === "links"
-                  ? "bg-blue-600 text-white shadow-sm"
-                  : "text-slate-400 hover:text-slate-200"
+                  ? "bg-white text-neutral-900 shadow-xs font-bold"
+                  : "text-neutral-600 hover:text-neutral-900"
               }`}
             >
               <Plus className="w-3.5 h-3.5" />
@@ -305,21 +300,21 @@ export default function AdminPage() {
             </button>
             <button
               onClick={() => setActiveTab("profile")}
-              className={`flex-1 py-2 text-xs font-semibold rounded-lg flex items-center justify-center gap-2 transition-all ${
+              className={`flex-1 py-2 text-xs font-semibold rounded-xl flex items-center justify-center gap-2 transition-all ${
                 activeTab === "profile"
-                  ? "bg-blue-600 text-white shadow-sm"
-                  : "text-slate-400 hover:text-slate-200"
+                  ? "bg-white text-neutral-900 shadow-xs font-bold"
+                  : "text-neutral-600 hover:text-neutral-900"
               }`}
             >
               <User className="w-3.5 h-3.5" />
-              <span>Profile & Theme</span>
+              <span>Profile & Bio</span>
             </button>
             <button
               onClick={() => setActiveTab("settings")}
-              className={`flex-1 py-2 text-xs font-semibold rounded-lg flex items-center justify-center gap-2 transition-all ${
+              className={`flex-1 py-2 text-xs font-semibold rounded-xl flex items-center justify-center gap-2 transition-all ${
                 activeTab === "settings"
-                  ? "bg-blue-600 text-white shadow-sm"
-                  : "text-slate-400 hover:text-slate-200"
+                  ? "bg-white text-neutral-900 shadow-xs font-bold"
+                  : "text-neutral-600 hover:text-neutral-900"
               }`}
             >
               <Settings className="w-3.5 h-3.5" />
@@ -330,50 +325,49 @@ export default function AdminPage() {
           {/* TAB 1: LINKS MANAGEMENT */}
           {activeTab === "links" && (
             <div className="space-y-4">
-              {/* Live Click Analytics Overview */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 p-4 bg-slate-900 border border-slate-800 rounded-2xl shadow-md">
+              {/* Live Click Analytics Overview Banner */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 p-4 sm:p-5 bg-white border border-neutral-200/90 rounded-2xl shadow-xs">
                 <div className="flex flex-col">
-                  <span className="text-[11px] uppercase tracking-wider font-semibold text-slate-400 flex items-center gap-1.5">
-                    <Flame className="w-3.5 h-3.5 text-amber-400" />
+                  <span className="text-[11px] uppercase tracking-wider font-semibold text-neutral-500 flex items-center gap-1.5">
+                    <Flame className="w-3.5 h-3.5 text-amber-500" />
                     <span>Total Clicks (All)</span>
                   </span>
-                  <span className="text-2xl font-black text-white mt-1">
-                    {data.links.reduce((acc, l) => acc + (l.clicks || 0), 0)}
+                  <span className="text-2xl font-black text-neutral-900 mt-1">
+                    {totalClicks}
                   </span>
                 </div>
 
                 <div className="flex flex-col">
-                  <span className="text-[11px] uppercase tracking-wider font-semibold text-slate-400 flex items-center gap-1.5">
-                    <TrendingUp className="w-3.5 h-3.5 text-blue-400" />
+                  <span className="text-[11px] uppercase tracking-wider font-semibold text-neutral-500 flex items-center gap-1.5">
+                    <TrendingUp className="w-3.5 h-3.5 text-blue-500" />
                     <span>Top Link</span>
                   </span>
-                  <span className="text-sm font-bold text-white mt-1 truncate">
-                    {(() => {
-                      const top = [...data.links].sort((a, b) => (b.clicks || 0) - (a.clicks || 0))[0];
-                      return top && (top.clicks || 0) > 0 ? `${top.title} (${top.clicks})` : "No clicks yet";
-                    })()}
+                  <span className="text-sm font-bold text-neutral-900 mt-1 truncate">
+                    {topLink && (topLink.clicks || 0) > 0
+                      ? `${topLink.title} (${topLink.clicks})`
+                      : "No clicks yet"}
                   </span>
                 </div>
 
                 <div className="flex flex-col">
-                  <span className="text-[11px] uppercase tracking-wider font-semibold text-slate-400 flex items-center gap-1.5">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                  <span className="text-[11px] uppercase tracking-wider font-semibold text-neutral-500 flex items-center gap-1.5">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
                     <span>Active Links</span>
                   </span>
-                  <span className="text-2xl font-black text-white mt-1">
-                    {data.links.filter((l) => l.active).length} of {data.links.length}
+                  <span className="text-2xl font-black text-neutral-900 mt-1">
+                    {activeLinksCount} of {data.links.length}
                   </span>
                 </div>
               </div>
 
               <div className="flex items-center justify-between pt-1">
                 <div>
-                  <h2 className="text-base font-bold text-white">Your Social Links</h2>
-                  <p className="text-xs text-slate-400">Add, reorder, or toggle your bio links.</p>
+                  <h2 className="text-base font-bold text-neutral-900">Your Social Links</h2>
+                  <p className="text-xs text-neutral-500">Add, reorder, or toggle your bio links.</p>
                 </div>
                 <button
                   onClick={() => setShowAddModal(true)}
-                  className="px-4 py-2 bg-blue-600 hover:bg-blue-500 active:scale-95 text-white text-xs font-semibold rounded-xl flex items-center gap-1.5 transition-all shadow-md shadow-blue-600/30"
+                  className="px-4 py-2 bg-neutral-900 hover:bg-neutral-800 active:scale-95 text-white text-xs font-semibold rounded-xl flex items-center gap-1.5 transition-all shadow-xs"
                 >
                   <Plus className="w-4 h-4" />
                   <span>Add New Link</span>
@@ -385,26 +379,26 @@ export default function AdminPage() {
                 {data.links.map((link, idx) => (
                   <div
                     key={link.id}
-                    className={`flex items-center justify-between p-3.5 rounded-2xl border transition-all ${
+                    className={`flex items-center justify-between p-3.5 sm:p-4 rounded-2xl border transition-all ${
                       link.active
-                        ? "bg-slate-900/90 border-slate-800 hover:border-slate-700"
-                        : "bg-slate-900/40 border-slate-800/40 opacity-60"
+                        ? "bg-white border-neutral-200/90 shadow-xs hover:border-neutral-300"
+                        : "bg-neutral-100/70 border-neutral-200/60 opacity-60"
                     }`}
                   >
                     {/* Left: Icon & Title */}
-                    <div className="flex items-center gap-3 flex-1 min-w-0 pr-2">
-                      <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 shadow-inner overflow-hidden">
+                    <div className="flex items-center gap-3.5 flex-1 min-w-0 pr-2">
+                      <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 shadow-xs overflow-hidden">
                         <SocialIcon platform={link.platform} fallbackIcon={link.icon} className="w-10 h-10" />
                       </div>
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-2">
-                          <p className="text-sm font-semibold text-white truncate">{link.title}</p>
-                          <span className="text-[10px] px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20 font-bold flex items-center gap-1 shrink-0">
-                            <Flame className="w-3 h-3 text-amber-400" />
+                          <p className="text-sm font-bold text-neutral-900 truncate">{link.title}</p>
+                          <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200 font-bold flex items-center gap-1 shrink-0">
+                            <Flame className="w-3 h-3 text-amber-500" />
                             <span>{link.clicks || 0} clicks</span>
                           </span>
                         </div>
-                        <p className="text-xs text-slate-400 truncate">{link.url}</p>
+                        <p className="text-xs text-neutral-400 truncate mt-0.5">{link.url}</p>
                       </div>
                     </div>
 
@@ -414,7 +408,7 @@ export default function AdminPage() {
                       <button
                         onClick={() => handleMove(idx, "up")}
                         disabled={idx === 0}
-                        className="p-1.5 text-slate-400 hover:text-white disabled:opacity-20 hover:bg-slate-800 rounded-lg transition-colors"
+                        className="p-1.5 text-neutral-400 hover:text-neutral-900 hover:bg-neutral-100 disabled:opacity-20 rounded-lg transition-colors"
                         title="Move Up"
                       >
                         <ArrowUp className="w-4 h-4" />
@@ -424,7 +418,7 @@ export default function AdminPage() {
                       <button
                         onClick={() => handleMove(idx, "down")}
                         disabled={idx === data.links.length - 1}
-                        className="p-1.5 text-slate-400 hover:text-white disabled:opacity-20 hover:bg-slate-800 rounded-lg transition-colors"
+                        className="p-1.5 text-neutral-400 hover:text-neutral-900 hover:bg-neutral-100 disabled:opacity-20 rounded-lg transition-colors"
                         title="Move Down"
                       >
                         <ArrowDown className="w-4 h-4" />
@@ -435,8 +429,8 @@ export default function AdminPage() {
                         onClick={() => handleToggleActive(link.id)}
                         className={`p-1.5 rounded-lg transition-colors ${
                           link.active
-                            ? "text-emerald-400 hover:bg-emerald-500/10"
-                            : "text-slate-500 hover:bg-slate-800"
+                            ? "text-emerald-600 hover:bg-emerald-50"
+                            : "text-neutral-400 hover:bg-neutral-100"
                         }`}
                         title={link.active ? "Hide Link" : "Show Link"}
                       >
@@ -446,7 +440,7 @@ export default function AdminPage() {
                       {/* Delete */}
                       <button
                         onClick={() => handleDeleteLink(link.id)}
-                        className="p-1.5 text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 rounded-lg transition-colors"
+                        className="p-1.5 text-neutral-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
                         title="Delete Link"
                       >
                         <Trash2 className="w-4 h-4" />
@@ -458,17 +452,17 @@ export default function AdminPage() {
             </div>
           )}
 
-          {/* TAB 2: PROFILE & THEME */}
+          {/* TAB 2: PROFILE & BIO */}
           {activeTab === "profile" && (
-            <div className="space-y-6 bg-slate-900/60 p-6 rounded-2xl border border-slate-800">
+            <div className="space-y-5 bg-white p-6 rounded-2xl border border-neutral-200/90 shadow-xs">
               <div>
-                <h2 className="text-base font-bold text-white">Profile Details</h2>
-                <p className="text-xs text-slate-400">Update how your profile appears on TikTok.</p>
+                <h2 className="text-base font-bold text-neutral-900">Profile Details</h2>
+                <p className="text-xs text-neutral-500">Update how your profile appears on TikTok.</p>
               </div>
 
               <div className="space-y-4">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">Display Name</label>
+                  <label className="block text-xs font-bold text-neutral-700 mb-1.5">Display Name</label>
                   <input
                     type="text"
                     value={data.profile.name}
@@ -478,12 +472,12 @@ export default function AdminPage() {
                         profile: { ...data.profile, name: e.target.value },
                       })
                     }
-                    className="w-full px-3.5 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-sm text-white focus:outline-none focus:border-blue-500"
+                    className="w-full px-3.5 py-2.5 bg-white border border-neutral-300 rounded-xl text-sm text-neutral-900 focus:outline-none focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">TikTok / Brand Handle</label>
+                  <label className="block text-xs font-bold text-neutral-700 mb-1.5">TikTok / Brand Handle</label>
                   <input
                     type="text"
                     value={data.profile.handle}
@@ -493,12 +487,12 @@ export default function AdminPage() {
                         profile: { ...data.profile, handle: e.target.value },
                       })
                     }
-                    className="w-full px-3.5 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-sm text-white focus:outline-none focus:border-blue-500"
+                    className="w-full px-3.5 py-2.5 bg-white border border-neutral-300 rounded-xl text-sm text-neutral-900 focus:outline-none focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">Bio Tagline</label>
+                  <label className="block text-xs font-bold text-neutral-700 mb-1.5">Bio Tagline</label>
                   <textarea
                     rows={3}
                     value={data.profile.bio}
@@ -508,12 +502,12 @@ export default function AdminPage() {
                         profile: { ...data.profile, bio: e.target.value },
                       })
                     }
-                    className="w-full px-3.5 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-sm text-white focus:outline-none focus:border-blue-500 resize-none"
+                    className="w-full px-3.5 py-2.5 bg-white border border-neutral-300 rounded-xl text-sm text-neutral-900 focus:outline-none focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900 resize-none"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">Avatar Image URL</label>
+                  <label className="block text-xs font-bold text-neutral-700 mb-1.5">Avatar Image URL</label>
                   <input
                     type="text"
                     value={data.profile.avatar}
@@ -524,52 +518,25 @@ export default function AdminPage() {
                       })
                     }
                     placeholder="/images/avatar.png or any online image URL"
-                    className="w-full px-3.5 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-sm text-white focus:outline-none focus:border-blue-500"
+                    className="w-full px-3.5 py-2.5 bg-white border border-neutral-300 rounded-xl text-sm text-neutral-900 focus:outline-none focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900"
                   />
-                  <p className="text-[11px] text-slate-500 mt-1">Default local avatar is <code>/images/avatar.png</code></p>
-                </div>
-
-                <div className="pt-2">
-                  <label className="block text-xs font-semibold text-slate-300 mb-2">Page Theme</label>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                    {themes.map((t) => (
-                      <button
-                        key={t.id}
-                        onClick={() =>
-                          handleSave({
-                            ...data,
-                            profile: { ...data.profile, theme: t.id as any },
-                          })
-                        }
-                        className={`flex items-center justify-between p-3 rounded-xl border text-left transition-all ${
-                          data.profile.theme === t.id
-                            ? "border-blue-500 bg-blue-500/10 shadow-sm"
-                            : "border-slate-800 bg-slate-900/40 hover:border-slate-700"
-                        }`}
-                      >
-                        <span className="text-xs font-semibold text-slate-200">{t.name}</span>
-                        {data.profile.theme === t.id && (
-                          <CheckCircle2 className="w-4 h-4 text-blue-400" />
-                        )}
-                      </button>
-                    ))}
-                  </div>
+                  <p className="text-[11px] text-neutral-400 mt-1">Default local avatar is <code>/images/avatar.png</code></p>
                 </div>
               </div>
             </div>
           )}
 
-          {/* TAB 3: SETTINGS */}
+          {/* TAB 3: SETTINGS & PASSWORD */}
           {activeTab === "settings" && (
-            <div className="space-y-6 bg-slate-900/60 p-6 rounded-2xl border border-slate-800">
+            <div className="space-y-6 bg-white p-6 rounded-2xl border border-neutral-200/90 shadow-xs">
               <div>
-                <h2 className="text-base font-bold text-white">Security & Backup</h2>
-                <p className="text-xs text-slate-400">Manage your access PIN and data.</p>
+                <h2 className="text-base font-bold text-neutral-900">Security & Backup</h2>
+                <p className="text-xs text-neutral-500">Manage your access password and data backup.</p>
               </div>
 
               <div className="space-y-4">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">Admin Security PIN / Password</label>
+                  <label className="block text-xs font-bold text-neutral-700 mb-1.5">Admin Security Password</label>
                   <div className="relative flex items-center">
                     <input
                       type={showPin ? "text" : "password"}
@@ -581,14 +548,14 @@ export default function AdminPage() {
                           profile: { ...data.profile, adminPin: val },
                         });
                       }}
-                      placeholder="Enter new PIN or password"
-                      className="w-full px-3.5 py-2.5 pr-28 bg-slate-900 border border-slate-700 rounded-xl text-sm text-white focus:outline-none focus:border-blue-500"
+                      placeholder="Enter new password"
+                      className="w-full px-3.5 py-2.5 pr-28 bg-white border border-neutral-300 rounded-xl text-sm text-neutral-900 focus:outline-none focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900"
                     />
                     <div className="absolute right-2 flex items-center gap-1.5">
                       <button
                         type="button"
                         onClick={() => setShowPin(!showPin)}
-                        className="p-1.5 text-slate-400 hover:text-white transition-colors rounded-lg"
+                        className="p-1.5 text-neutral-400 hover:text-neutral-700 transition-colors rounded-lg"
                         title={showPin ? "Hide Password" : "Show Password"}
                       >
                         {showPin ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -603,14 +570,14 @@ export default function AdminPage() {
                           setPinUpdated(true);
                           setTimeout(() => setPinUpdated(false), 2500);
                         }}
-                        className="px-3 py-1 bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold rounded-lg transition-all shadow-sm"
+                        className="px-3.5 py-1.5 bg-neutral-900 hover:bg-neutral-800 text-white text-xs font-semibold rounded-lg transition-all shadow-xs"
                       >
                         {pinUpdated ? "Saved!" : "Save"}
                       </button>
                     </div>
                   </div>
                   <div className="flex items-center justify-between mt-2">
-                    <p className="text-[11px] text-slate-500">Type a new PIN/password and click Save.</p>
+                    <p className="text-[11px] text-neutral-500">Current password is <code>Apple2003@</code></p>
                     <button
                       type="button"
                       onClick={() => {
@@ -623,15 +590,15 @@ export default function AdminPage() {
                         setPinUpdated(true);
                         setTimeout(() => setPinUpdated(false), 2500);
                       }}
-                      className="text-[11px] text-slate-400 hover:text-white underline transition-colors"
+                      className="text-[11px] text-neutral-600 hover:text-neutral-900 underline font-medium transition-colors"
                     >
-                      Reset PIN to Apple2003@
+                      Reset Password to Apple2003@
                     </button>
                   </div>
                 </div>
 
-                <div className="pt-4 border-t border-slate-800">
-                  <h3 className="text-xs font-bold text-slate-300 mb-2">Export Data Backup</h3>
+                <div className="pt-4 border-t border-neutral-100">
+                  <h3 className="text-xs font-bold text-neutral-700 mb-2">Export Data Backup</h3>
                   <button
                     onClick={() => {
                       const blob = new Blob([JSON.stringify(data, null, 2)], {
@@ -643,7 +610,7 @@ export default function AdminPage() {
                       a.download = "dan1elcodm-links-backup.json";
                       a.click();
                     }}
-                    className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold rounded-xl border border-slate-700 transition-colors flex items-center gap-1.5"
+                    className="px-4 py-2 bg-neutral-100 hover:bg-neutral-200 text-neutral-800 text-xs font-semibold rounded-xl border border-neutral-200 transition-colors flex items-center gap-1.5"
                   >
                     <Save className="w-3.5 h-3.5" />
                     <span>Download Backup (JSON)</span>
@@ -657,24 +624,24 @@ export default function AdminPage() {
         {/* Right Column: Live Phone Simulator (Cols 5) */}
         <div className="lg:col-span-5 sticky top-24">
           <div className="text-center mb-3">
-            <span className="text-xs font-semibold text-slate-400 flex items-center justify-center gap-1.5">
-              <Smartphone className="w-3.5 h-3.5 text-blue-400" />
+            <span className="text-xs font-semibold text-neutral-500 flex items-center justify-center gap-1.5">
+              <Smartphone className="w-3.5 h-3.5 text-neutral-700" />
               <span>Live Phone Simulator</span>
             </span>
           </div>
 
           {/* iPhone Frame */}
-          <div className="mx-auto w-[320px] h-[640px] bg-slate-900 rounded-[48px] p-3 shadow-2xl border-4 border-slate-800 relative shadow-black/80 ring-1 ring-white/10">
+          <div className="mx-auto w-[320px] h-[640px] bg-neutral-900 rounded-[48px] p-3 shadow-2xl border-4 border-neutral-800 relative shadow-neutral-400/20 ring-1 ring-black/10">
             {/* Dynamic Island / Speaker Notch */}
             <div className="absolute top-5 left-1/2 -translate-x-1/2 w-24 h-5 bg-black rounded-full z-20 flex items-center justify-center">
-              <div className="w-2.5 h-2.5 rounded-full bg-slate-900 mr-2" />
+              <div className="w-2.5 h-2.5 rounded-full bg-neutral-800 mr-2" />
               <div className="w-2 h-2 rounded-full bg-blue-950/80" />
             </div>
 
             {/* Inner Phone Screen (Authentic Linktree Light Mode) */}
-            <div className="w-full h-full rounded-[38px] overflow-y-auto bg-[#f5f6f8] flex flex-col items-center pt-9 pb-6 px-3 relative border border-slate-700/60 scrollbar-none text-neutral-900">
+            <div className="w-full h-full rounded-[38px] overflow-y-auto bg-[#f5f6f8] flex flex-col items-center pt-9 pb-6 px-3 relative border border-neutral-200/60 scrollbar-none text-neutral-900">
               {/* Profile Avatar */}
-              <div className="w-16 h-16 rounded-full overflow-hidden p-0.5 bg-white border border-neutral-200 shadow-sm mb-2 shrink-0">
+              <div className="w-16 h-16 rounded-full overflow-hidden p-0.5 bg-white border border-neutral-200 shadow-xs mb-2 shrink-0">
                 <img
                   src={data.profile.avatar || "/images/avatar.png"}
                   alt={data.profile.name}
@@ -727,18 +694,18 @@ export default function AdminPage() {
         </div>
       </div>
 
-      {/* ADD LINK MODAL */}
+      {/* ADD LINK MODAL (White Theme) */}
       {showAddModal && (
-        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="w-full max-w-md bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl animate-scale-in">
-            <h3 className="text-base font-bold text-white mb-1">Add New Social Link</h3>
-            <p className="text-xs text-slate-400 mb-5">Choose a platform preset or enter a custom link.</p>
+        <div className="fixed inset-0 bg-neutral-950/40 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+          <div className="w-full max-w-md bg-white border border-neutral-200 rounded-3xl p-6 shadow-2xl animate-scale-in text-neutral-900">
+            <h3 className="text-base font-bold text-neutral-900 mb-1">Add New Social Link</h3>
+            <p className="text-xs text-neutral-500 mb-5">Choose a platform preset or enter a custom link.</p>
 
             <div className="space-y-4">
               {/* Preset Selector */}
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1.5">Choose Platform</label>
-                <div className="grid grid-cols-3 gap-2 max-h-48 overflow-y-auto p-1 border border-slate-800 rounded-xl bg-slate-950/60">
+                <label className="block text-xs font-bold text-neutral-700 mb-1.5">Choose Platform</label>
+                <div className="grid grid-cols-3 gap-2 max-h-48 overflow-y-auto p-1.5 border border-neutral-200 rounded-2xl bg-neutral-50">
                   {PLATFORM_PRESETS.map((p) => (
                     <button
                       key={p.id}
@@ -746,17 +713,14 @@ export default function AdminPage() {
                       onClick={() => handlePresetChange(p.id)}
                       className={`flex flex-col items-center justify-center p-2 rounded-xl text-center border transition-all ${
                         selectedPreset.id === p.id
-                          ? "border-blue-500 bg-blue-500/20 text-white shadow-sm"
-                          : "border-transparent hover:bg-slate-900 text-slate-400 hover:text-slate-200"
+                          ? "border-neutral-900 bg-white text-neutral-900 shadow-xs font-bold"
+                          : "border-transparent hover:bg-neutral-200/60 text-neutral-600"
                       }`}
                     >
-                      <div
-                        className="w-7 h-7 rounded-lg flex items-center justify-center mb-1 overflow-hidden"
-                        style={{ backgroundColor: p.bgColor }}
-                      >
-                        <img src={p.icon} alt={p.name} className="w-4 h-4 object-contain" />
+                      <div className="w-7 h-7 flex items-center justify-center mb-1">
+                        <SocialIcon platform={p.id} fallbackIcon={p.icon} className="w-6 h-6" />
                       </div>
-                      <span className="text-[10px] font-semibold truncate w-full">{p.name}</span>
+                      <span className="text-[10px] truncate w-full">{p.name}</span>
                     </button>
                   ))}
                 </div>
@@ -764,25 +728,25 @@ export default function AdminPage() {
 
               {/* Title Input */}
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">Button Title</label>
+                <label className="block text-xs font-bold text-neutral-700 mb-1.5">Button Title</label>
                 <input
                   type="text"
                   value={newTitle}
                   onChange={(e) => setNewTitle(e.target.value)}
                   placeholder="e.g. Join Discord Community"
-                  className="w-full px-3.5 py-2 bg-slate-950 border border-slate-800 rounded-xl text-sm text-white focus:outline-none focus:border-blue-500"
+                  className="w-full px-3.5 py-2.5 bg-white border border-neutral-300 rounded-xl text-sm text-neutral-900 focus:outline-none focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900"
                 />
               </div>
 
               {/* URL Input */}
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">Destination URL</label>
+                <label className="block text-xs font-bold text-neutral-700 mb-1.5">Destination URL</label>
                 <input
                   type="url"
                   value={newUrl}
                   onChange={(e) => setNewUrl(e.target.value)}
                   placeholder={selectedPreset.placeholder}
-                  className="w-full px-3.5 py-2 bg-slate-950 border border-slate-800 rounded-xl text-sm text-white focus:outline-none focus:border-blue-500"
+                  className="w-full px-3.5 py-2.5 bg-white border border-neutral-300 rounded-xl text-sm text-neutral-900 focus:outline-none focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900"
                   autoFocus
                 />
               </div>
@@ -792,7 +756,7 @@ export default function AdminPage() {
                 <button
                   type="button"
                   onClick={() => setShowAddModal(false)}
-                  className="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold rounded-xl transition-colors"
+                  className="flex-1 py-2.5 bg-neutral-100 hover:bg-neutral-200 text-neutral-700 text-xs font-semibold rounded-xl transition-colors"
                 >
                   Cancel
                 </button>
@@ -800,7 +764,7 @@ export default function AdminPage() {
                   type="button"
                   onClick={handleAddLink}
                   disabled={!newUrl.trim()}
-                  className="flex-1 py-2.5 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white text-xs font-semibold rounded-xl transition-colors shadow-md shadow-blue-600/30"
+                  className="flex-1 py-2.5 bg-neutral-900 hover:bg-neutral-800 disabled:opacity-50 text-white text-xs font-semibold rounded-xl transition-colors shadow-xs"
                 >
                   Add to Bio
                 </button>
@@ -812,4 +776,3 @@ export default function AdminPage() {
     </div>
   );
 }
-

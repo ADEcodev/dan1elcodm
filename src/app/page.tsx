@@ -190,8 +190,8 @@ export default function HomePage() {
                 className="linktree-card group flex items-center justify-between w-full p-3.5 sm:p-4 rounded-2xl bg-white border border-neutral-200/90 shadow-[0_2px_8px_rgba(0,0,0,0.04)] text-neutral-900 cursor-pointer"
               >
                 {/* Left: Official Vector Icon */}
-                <div className="w-11 h-11 rounded-xl flex items-center justify-center shrink-0 shadow-xs overflow-hidden">
-                  <SocialIcon platform={link.platform} fallbackIcon={link.icon} className="w-11 h-11" />
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 overflow-hidden">
+                  <SocialIcon platform={link.platform} fallbackIcon={link.icon} className="w-9 h-9" />
                 </div>
 
                 {/* Center: Title */}
@@ -207,7 +207,7 @@ export default function HomePage() {
                     e.stopPropagation();
                     setActiveMenuId(activeMenuId === link.id ? null : link.id);
                   }}
-                  className="w-9 h-9 rounded-xl flex items-center justify-center text-neutral-400 hover:text-neutral-900 hover:bg-neutral-100 transition-colors shrink-0"
+                  className="w-10 h-10 rounded-xl flex items-center justify-center text-neutral-400 hover:text-neutral-900 hover:bg-neutral-100 transition-colors shrink-0"
                   title="More options"
                 >
                   <MoreHorizontal className="w-5 h-5" />
