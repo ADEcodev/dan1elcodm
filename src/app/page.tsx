@@ -1,20 +1,26 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
 import {
   CheckCircle2,
   Share2,
   Check,
   MoreHorizontal,
-  ExternalLink
+  ExternalLink,
+  Copy,
+  Globe
 } from "lucide-react";
 import defaultData from "../../data/links.json";
+import { SocialIcon } from "@/components/SocialIcon";
 import { SiteData, LinkItem } from "@/types";
 
 export default function HomePage() {
   const [data, setData] = useState<SiteData>(defaultData as SiteData);
   const [copied, setCopied] = useState(false);
+  const [activeMenuId, setActiveMenuId] = useState<string | null>(null);
+  const [copiedLinkId, setCopiedLinkId] = useState<string | null>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     // 1. Instant local reactive state
@@ -37,6 +43,15 @@ export default function HomePage() {
         }
       })
       .catch((err) => console.log("Using cached data", err));
+
+    // Close menu on outside click
+    const handleClickOutside = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setActiveMenuId(null);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   const handleShare = () => {
@@ -54,6 +69,34 @@ export default function HomePage() {
     const updated = { ...data, links: updatedLinks };
     setData(updated);
     localStorage.setItem("dan1elcodm_links_data", JSON.stringify(updated));
+
+    // Fire background sync
+    fetch("/api/data", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(updated),
+    }).catch(() => {});
+  };
+
+  const handleCopyLink = (e: React.MouseEvent, link: LinkItem) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(link.url);
+      setCopiedLinkId(link.id);
+      setTimeout(() => {
+        setCopiedLinkId(null);
+        setActiveMenuId(null);
+      }, 1500);
+    }
+  };
+
+  const handleOpenBrowser = (e: React.MouseEvent, link: LinkItem) => {
+    e.preventDefault();
+    e.stopPropagation();
+    handleLinkClick(link.id);
+    setActiveMenuId(null);
+    window.open(link.url, "_blank");
   };
 
   const activeLinks = data.links.filter((l) => l.active !== false);
@@ -119,7 +162,7 @@ export default function HomePage() {
           </p>
         )}
 
-        {/* Social Icons Bar (Authentic Linktree header icons) */}
+        {/* Social Icons Bar (Authentic Linktree header icons with vector SVGs) */}
         <div className="flex items-center gap-3 my-5">
           {activeLinks.map((l) => (
             <a
@@ -128,46 +171,83 @@ export default function HomePage() {
               target="_blank"
               rel="noopener noreferrer"
               title={l.title}
-              className="w-9 h-9 rounded-full bg-white border border-neutral-200/80 flex items-center justify-center p-2 shadow-sm hover:shadow-md hover:scale-110 active:scale-95 transition-all"
+              className="w-10 h-10 rounded-full bg-white border border-neutral-200/90 flex items-center justify-center p-2 shadow-xs hover:shadow-md hover:scale-110 active:scale-95 transition-all"
             >
-              <img src={l.icon} alt={l.title} className="w-4 h-4 object-contain" />
+              <SocialIcon platform={l.platform} fallbackIcon={l.icon} className="w-5 h-5" />
             </a>
           ))}
         </div>
 
         {/* Links Cards (Clean White Linktree Pills) */}
-        <div className="w-full space-y-3.5 px-2">
+        <div className="w-full space-y-3.5 px-2 relative" ref={menuRef}>
           {activeLinks.map((link) => (
-            <a
-              key={link.id}
-              href={link.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={() => handleLinkClick(link.id)}
-              className="linktree-card group flex items-center justify-between w-full p-3.5 sm:p-4 rounded-2xl bg-white border border-neutral-200/90 shadow-[0_2px_8px_rgba(0,0,0,0.04)] text-neutral-900 cursor-pointer"
-            >
-              {/* Left: Brand Icon */}
-              <div
-                className="w-11 h-11 rounded-xl flex items-center justify-center shrink-0 shadow-sm p-2 overflow-hidden"
-                style={{ backgroundColor: link.bgColor || "#000000" }}
+            <div key={link.id} className="relative">
+              <a
+                href={link.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => handleLinkClick(link.id)}
+                className="linktree-card group flex items-center justify-between w-full p-3.5 sm:p-4 rounded-2xl bg-white border border-neutral-200/90 shadow-[0_2px_8px_rgba(0,0,0,0.04)] text-neutral-900 cursor-pointer"
               >
-                {link.icon ? (
-                  <img src={link.icon} alt={link.title} className="w-5 h-5 object-contain" />
-                ) : (
-                  <ExternalLink className="w-5 h-5 text-white" />
-                )}
-              </div>
+                {/* Left: Official Vector Icon */}
+                <div className="w-11 h-11 rounded-xl flex items-center justify-center shrink-0 shadow-xs overflow-hidden">
+                  <SocialIcon platform={link.platform} fallbackIcon={link.icon} className="w-11 h-11" />
+                </div>
 
-              {/* Center: Title */}
-              <div className="flex-1 text-center font-semibold text-sm sm:text-base text-neutral-900 px-3 tracking-tight truncate">
-                {link.title}
-              </div>
+                {/* Center: Title */}
+                <div className="flex-1 text-center font-semibold text-sm sm:text-base text-neutral-900 px-3 tracking-tight truncate">
+                  {link.title}
+                </div>
 
-              {/* Right: Three Dots / Subtle Action */}
-              <div className="w-8 h-8 rounded-lg flex items-center justify-center text-neutral-400 group-hover:text-neutral-700 transition-colors shrink-0">
-                <MoreHorizontal className="w-5 h-5" />
-              </div>
-            </a>
+                {/* Right: Three Dots Trigger */}
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setActiveMenuId(activeMenuId === link.id ? null : link.id);
+                  }}
+                  className="w-9 h-9 rounded-xl flex items-center justify-center text-neutral-400 hover:text-neutral-900 hover:bg-neutral-100 transition-colors shrink-0"
+                  title="More options"
+                >
+                  <MoreHorizontal className="w-5 h-5" />
+                </button>
+              </a>
+
+              {/* Three Dots Dropdown Menu */}
+              {activeMenuId === link.id && (
+                <div className="absolute right-2 top-full mt-1.5 w-48 bg-white border border-neutral-200 rounded-2xl shadow-xl py-1.5 z-30 animate-fade-in text-left">
+                  {/* Copy Link Option */}
+                  <button
+                    type="button"
+                    onClick={(e) => handleCopyLink(e, link)}
+                    className="w-full px-3.5 py-2.5 text-xs font-semibold text-neutral-700 hover:bg-neutral-50 flex items-center gap-2.5 transition-colors"
+                  >
+                    {copiedLinkId === link.id ? (
+                      <>
+                        <Check className="w-4 h-4 text-emerald-600" />
+                        <span className="text-emerald-600 font-bold">Link Copied!</span>
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="w-4 h-4 text-neutral-500" />
+                        <span>Copy Link</span>
+                      </>
+                    )}
+                  </button>
+
+                  {/* Open in Browser Option */}
+                  <button
+                    type="button"
+                    onClick={(e) => handleOpenBrowser(e, link)}
+                    className="w-full px-3.5 py-2.5 text-xs font-semibold text-neutral-700 hover:bg-neutral-50 flex items-center gap-2.5 transition-colors border-t border-neutral-100"
+                  >
+                    <Globe className="w-4 h-4 text-neutral-500" />
+                    <span>Open in Browser</span>
+                  </button>
+                </div>
+              )}
+            </div>
           ))}
         </div>
       </div>

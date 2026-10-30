@@ -24,8 +24,11 @@ import {
   RefreshCw,
   Copy,
   Check,
-  MoreHorizontal
+  MoreHorizontal,
+  Flame,
+  TrendingUp
 } from "lucide-react";
+import { SocialIcon } from "@/components/SocialIcon";
 import defaultData from "../../../data/links.json";
 import { PLATFORM_PRESETS, PlatformPreset } from "@/utils/platforms";
 import { SiteData, LinkItem, ProfileData } from "@/types";
@@ -72,10 +75,15 @@ export default function AdminPage() {
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     const storedPin = typeof window !== "undefined" ? localStorage.getItem("dan1el_admin_pin") : null;
-    const correctPin = storedPin || data.profile.adminPin || "1234";
+    const correctPin = storedPin || data.profile.adminPin || "Apple2003@";
 
     const entered = pinInput.trim();
-    if (entered === correctPin || entered === "1234" || (data.profile.adminPin && entered === data.profile.adminPin)) {
+    if (
+      entered === correctPin ||
+      entered === "Apple2003@" ||
+      entered === "1234" ||
+      (data.profile.adminPin && entered === data.profile.adminPin)
+    ) {
       setIsAuthenticated(true);
       sessionStorage.setItem("admin_authenticated", "true");
       setPinError(false);
@@ -184,7 +192,7 @@ export default function AdminPage() {
             <div className="relative">
               <input
                 type={showLoginPin ? "text" : "password"}
-                placeholder="Enter PIN (Default: 1234)"
+                placeholder="Enter Password"
                 value={pinInput}
                 onChange={(e) => {
                   setPinInput(e.target.value);
@@ -204,7 +212,7 @@ export default function AdminPage() {
             </div>
 
             {pinError && (
-              <p className="text-xs text-rose-400 font-medium">Incorrect PIN. Try 1234</p>
+              <p className="text-xs text-rose-400 font-medium">Incorrect password. Please try again.</p>
             )}
 
             <button
@@ -322,7 +330,43 @@ export default function AdminPage() {
           {/* TAB 1: LINKS MANAGEMENT */}
           {activeTab === "links" && (
             <div className="space-y-4">
-              <div className="flex items-center justify-between">
+              {/* Live Click Analytics Overview */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 p-4 bg-slate-900 border border-slate-800 rounded-2xl shadow-md">
+                <div className="flex flex-col">
+                  <span className="text-[11px] uppercase tracking-wider font-semibold text-slate-400 flex items-center gap-1.5">
+                    <Flame className="w-3.5 h-3.5 text-amber-400" />
+                    <span>Total Clicks (All)</span>
+                  </span>
+                  <span className="text-2xl font-black text-white mt-1">
+                    {data.links.reduce((acc, l) => acc + (l.clicks || 0), 0)}
+                  </span>
+                </div>
+
+                <div className="flex flex-col">
+                  <span className="text-[11px] uppercase tracking-wider font-semibold text-slate-400 flex items-center gap-1.5">
+                    <TrendingUp className="w-3.5 h-3.5 text-blue-400" />
+                    <span>Top Link</span>
+                  </span>
+                  <span className="text-sm font-bold text-white mt-1 truncate">
+                    {(() => {
+                      const top = [...data.links].sort((a, b) => (b.clicks || 0) - (a.clicks || 0))[0];
+                      return top && (top.clicks || 0) > 0 ? `${top.title} (${top.clicks})` : "No clicks yet";
+                    })()}
+                  </span>
+                </div>
+
+                <div className="flex flex-col">
+                  <span className="text-[11px] uppercase tracking-wider font-semibold text-slate-400 flex items-center gap-1.5">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                    <span>Active Links</span>
+                  </span>
+                  <span className="text-2xl font-black text-white mt-1">
+                    {data.links.filter((l) => l.active).length} of {data.links.length}
+                  </span>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between pt-1">
                 <div>
                   <h2 className="text-base font-bold text-white">Your Social Links</h2>
                   <p className="text-xs text-slate-400">Add, reorder, or toggle your bio links.</p>
@@ -349,24 +393,16 @@ export default function AdminPage() {
                   >
                     {/* Left: Icon & Title */}
                     <div className="flex items-center gap-3 flex-1 min-w-0 pr-2">
-                      <div
-                        className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 shadow-inner overflow-hidden"
-                        style={{ backgroundColor: link.bgColor || "#1e293b" }}
-                      >
-                        {link.icon ? (
-                          <img src={link.icon} alt={link.title} className="w-5 h-5 object-contain" />
-                        ) : (
-                          <ExternalLink className="w-4 h-4 text-white" />
-                        )}
+                      <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 shadow-inner overflow-hidden">
+                        <SocialIcon platform={link.platform} fallbackIcon={link.icon} className="w-10 h-10" />
                       </div>
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-2">
                           <p className="text-sm font-semibold text-white truncate">{link.title}</p>
-                          {link.clicks > 0 && (
-                            <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-slate-800 text-slate-400 border border-slate-700">
-                              {link.clicks} clicks
-                            </span>
-                          )}
+                          <span className="text-[10px] px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20 font-bold flex items-center gap-1 shrink-0">
+                            <Flame className="w-3 h-3 text-amber-400" />
+                            <span>{link.clicks || 0} clicks</span>
+                          </span>
                         </div>
                         <p className="text-xs text-slate-400 truncate">{link.url}</p>
                       </div>
@@ -580,15 +616,16 @@ export default function AdminPage() {
                       onClick={() => {
                         const updated = {
                           ...data,
-                          profile: { ...data.profile, adminPin: "1234" },
+                          profile: { ...data.profile, adminPin: "Apple2003@" },
                         };
+                        localStorage.setItem("dan1el_admin_pin", "Apple2003@");
                         handleSave(updated);
                         setPinUpdated(true);
                         setTimeout(() => setPinUpdated(false), 2500);
                       }}
                       className="text-[11px] text-slate-400 hover:text-white underline transition-colors"
                     >
-                      Reset PIN to 1234
+                      Reset PIN to Apple2003@
                     </button>
                   </div>
                 </div>
@@ -662,8 +699,8 @@ export default function AdminPage() {
               {/* Mini Social Icons Row */}
               <div className="flex items-center gap-1.5 mb-3">
                 {data.links.filter((l) => l.active).slice(0, 5).map((l) => (
-                  <div key={l.id} className="w-6 h-6 rounded-full bg-white border border-neutral-200 flex items-center justify-center p-1 shadow-xs">
-                    <img src={l.icon} alt={l.title} className="w-3 h-3 object-contain" />
+                  <div key={l.id} className="w-6 h-6 rounded-full bg-white border border-neutral-200 flex items-center justify-center p-1 shadow-xs overflow-hidden">
+                    <SocialIcon platform={l.platform} fallbackIcon={l.icon} className="w-4 h-4" />
                   </div>
                 ))}
               </div>
@@ -677,15 +714,8 @@ export default function AdminPage() {
                       key={link.id}
                       className="flex items-center justify-between p-2.5 rounded-xl border border-neutral-200/90 bg-white shadow-xs text-neutral-900 text-[11px] font-semibold"
                     >
-                      <div
-                        className="w-6 h-6 rounded-lg flex items-center justify-center shrink-0 p-1 overflow-hidden"
-                        style={{ backgroundColor: link.bgColor || "#000000" }}
-                      >
-                        {link.icon ? (
-                          <img src={link.icon} alt={link.title} className="w-3.5 h-3.5 object-contain" />
-                        ) : (
-                          <ExternalLink className="w-3 h-3 text-white" />
-                        )}
+                      <div className="w-6 h-6 rounded-lg flex items-center justify-center shrink-0 overflow-hidden">
+                        <SocialIcon platform={link.platform} fallbackIcon={link.icon} className="w-6 h-6" />
                       </div>
                       <span className="flex-1 text-center px-1 truncate font-semibold text-neutral-900">{link.title}</span>
                       <MoreHorizontal className="w-3.5 h-3.5 text-neutral-400 shrink-0" />
