@@ -23,7 +23,8 @@ import {
   LogOut,
   RefreshCw,
   Copy,
-  Check
+  Check,
+  MoreHorizontal
 } from "lucide-react";
 import defaultData from "../../../data/links.json";
 import { PLATFORM_PRESETS, PlatformPreset } from "@/utils/platforms";
@@ -600,10 +601,10 @@ export default function AdminPage() {
               <div className="w-2 h-2 rounded-full bg-blue-950/80" />
             </div>
 
-            {/* Inner Phone Screen */}
-            <div className="w-full h-full rounded-[38px] overflow-y-auto bg-slate-950 flex flex-col items-center pt-10 pb-6 px-3 relative border border-slate-800/60 scrollbar-none">
+            {/* Inner Phone Screen (Authentic Linktree Light Mode) */}
+            <div className="w-full h-full rounded-[38px] overflow-y-auto bg-[#f5f6f8] flex flex-col items-center pt-9 pb-6 px-3 relative border border-slate-700/60 scrollbar-none text-neutral-900">
               {/* Profile Avatar */}
-              <div className="w-16 h-16 rounded-full overflow-hidden p-0.5 ring-2 ring-white/20 mb-2.5 bg-slate-900 shrink-0">
+              <div className="w-16 h-16 rounded-full overflow-hidden p-0.5 bg-white border border-neutral-200 shadow-sm mb-2 shrink-0">
                 <img
                   src={data.profile.avatar || "/images/avatar.png"}
                   alt={data.profile.name}
@@ -612,68 +613,51 @@ export default function AdminPage() {
               </div>
 
               {/* Name & Handle */}
-              <h3 className="text-sm font-bold text-white flex items-center gap-1 text-center">
+              <h3 className="text-sm font-bold text-neutral-900 flex items-center gap-1 text-center">
                 <span>{data.profile.name}</span>
                 {data.profile.verified && (
-                  <CheckCircle2 className="w-3.5 h-3.5 text-blue-400 fill-blue-400 shrink-0" />
+                  <CheckCircle2 className="w-3.5 h-3.5 text-blue-500 fill-blue-500 shrink-0" />
                 )}
               </h3>
-              <p className="text-[11px] text-slate-400 mb-1">{data.profile.handle}</p>
+              <p className="text-[11px] text-neutral-500 mb-1">{data.profile.handle}</p>
               {data.profile.bio && (
-                <p className="text-[10px] text-slate-400 text-center max-w-[200px] mb-4 line-clamp-2">
+                <p className="text-[10px] text-neutral-600 text-center max-w-[210px] mb-3 line-clamp-2 leading-relaxed">
                   {data.profile.bio}
                 </p>
               )}
 
-              {/* Bento Preview */}
-              <div className="w-full space-y-2 mt-1">
-                {/* Hero WhatsApp card if active */}
+              {/* Mini Social Icons Row */}
+              <div className="flex items-center gap-1.5 mb-3">
+                {data.links.filter((l) => l.active).slice(0, 5).map((l) => (
+                  <div key={l.id} className="w-6 h-6 rounded-full bg-white border border-neutral-200 flex items-center justify-center p-1 shadow-xs">
+                    <img src={l.icon} alt={l.title} className="w-3 h-3 object-contain" />
+                  </div>
+                ))}
+              </div>
+
+              {/* Linktree White Card Pills */}
+              <div className="w-full space-y-2 mt-0.5">
                 {data.links
-                  .filter((l) => l.active && l.platform === "whatsapp")
+                  .filter((l) => l.active)
                   .map((link) => (
                     <div
                       key={link.id}
-                      className="p-2.5 rounded-2xl border border-emerald-500/30 bg-emerald-950/40 flex items-center justify-between text-white text-[11px] font-bold shadow-md"
+                      className="flex items-center justify-between p-2.5 rounded-xl border border-neutral-200/90 bg-white shadow-xs text-neutral-900 text-[11px] font-semibold"
                     >
-                      <div className="flex items-center gap-2 truncate">
-                        <div className="w-7 h-7 rounded-xl bg-[#25D366] flex items-center justify-center shrink-0 p-1">
-                          <img src={link.icon || "/images/icons/whatsapp.svg"} alt="WA" className="w-full h-full object-contain" />
-                        </div>
-                        <div className="truncate">
-                          <p className="truncate text-emerald-300">{link.title}</p>
-                          <span className="text-[9px] text-emerald-400/80 font-normal">VIP Community</span>
-                        </div>
+                      <div
+                        className="w-6 h-6 rounded-lg flex items-center justify-center shrink-0 p-1 overflow-hidden"
+                        style={{ backgroundColor: link.bgColor || "#000000" }}
+                      >
+                        {link.icon ? (
+                          <img src={link.icon} alt={link.title} className="w-3.5 h-3.5 object-contain" />
+                        ) : (
+                          <ExternalLink className="w-3 h-3 text-white" />
+                        )}
                       </div>
-                      <ExternalLink className="w-3 h-3 text-emerald-400 shrink-0" />
+                      <span className="flex-1 text-center px-1 truncate font-semibold text-neutral-900">{link.title}</span>
+                      <MoreHorizontal className="w-3.5 h-3.5 text-neutral-400 shrink-0" />
                     </div>
                   ))}
-
-                {/* 2-Column Bento Grid for Other Socials */}
-                <div className="grid grid-cols-2 gap-2 pt-0.5">
-                  {data.links
-                    .filter((l) => l.active && l.platform !== "whatsapp")
-                    .map((link) => (
-                      <div
-                        key={link.id}
-                        style={{
-                          backgroundColor: link.bgColor ? `${link.bgColor}15` : undefined,
-                          borderColor: link.bgColor ? `${link.bgColor}40` : undefined,
-                        }}
-                        className="p-2 rounded-xl border bg-slate-900/90 text-white flex flex-col justify-between h-20 shadow-sm"
-                      >
-                        <div className="flex items-center justify-between">
-                          <div
-                            className="w-5 h-5 rounded-lg flex items-center justify-center p-1"
-                            style={{ backgroundColor: link.bgColor || "#1e293b" }}
-                          >
-                            <img src={link.icon} alt={link.title} className="w-full h-full object-contain" />
-                          </div>
-                          <ExternalLink className="w-2.5 h-2.5 text-slate-400" />
-                        </div>
-                        <span className="text-[10px] font-bold truncate line-clamp-1">{link.title}</span>
-                      </div>
-                    ))}
-                </div>
               </div>
             </div>
           </div>
