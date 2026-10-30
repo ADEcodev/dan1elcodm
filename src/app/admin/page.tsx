@@ -40,6 +40,8 @@ export default function AdminPage() {
   const [selectedPreset, setSelectedPreset] = useState<PlatformPreset>(PLATFORM_PRESETS[0]);
   const [newTitle, setNewTitle] = useState(PLATFORM_PRESETS[0].defaultTitle);
   const [newUrl, setNewUrl] = useState("");
+  const [showPin, setShowPin] = useState(false);
+  const [pinUpdated, setPinUpdated] = useState(false);
 
   // Load existing data
   useEffect(() => {
@@ -67,8 +69,8 @@ export default function AdminPage() {
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    const correctPin = data.profile.adminPin || "1234";
-    if (pinInput === correctPin || pinInput === "1234") {
+    const correctPin = data.profile.adminPin ? data.profile.adminPin : "1234";
+    if (pinInput === correctPin) {
       setIsAuthenticated(true);
       sessionStorage.setItem("admin_authenticated", "true");
       setPinError(false);
@@ -517,19 +519,44 @@ export default function AdminPage() {
 
               <div className="space-y-4">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">Admin Security PIN</label>
-                  <input
-                    type="password"
-                    value={data.profile.adminPin || "1234"}
-                    onChange={(e) =>
-                      handleSave({
-                        ...data,
-                        profile: { ...data.profile, adminPin: e.target.value },
-                      })
-                    }
-                    className="w-full px-3.5 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-sm text-white focus:outline-none focus:border-blue-500"
-                  />
-                  <p className="text-[11px] text-slate-500 mt-1">Used to unlock this `/admin` dashboard.</p>
+                  <label className="block text-xs font-semibold text-slate-300 mb-1">Admin Security PIN / Password</label>
+                  <div className="relative flex items-center">
+                    <input
+                      type={showPin ? "text" : "password"}
+                      value={data.profile.adminPin ?? ""}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        setData({
+                          ...data,
+                          profile: { ...data.profile, adminPin: val },
+                        });
+                      }}
+                      placeholder="Enter new PIN or password"
+                      className="w-full px-3.5 py-2.5 pr-28 bg-slate-900 border border-slate-700 rounded-xl text-sm text-white focus:outline-none focus:border-blue-500"
+                    />
+                    <div className="absolute right-2 flex items-center gap-1.5">
+                      <button
+                        type="button"
+                        onClick={() => setShowPin(!showPin)}
+                        className="p-1.5 text-slate-400 hover:text-white transition-colors rounded-lg"
+                        title={showPin ? "Hide Password" : "Show Password"}
+                      >
+                        {showPin ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          handleSave(data);
+                          setPinUpdated(true);
+                          setTimeout(() => setPinUpdated(false), 2500);
+                        }}
+                        className="px-3 py-1 bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold rounded-lg transition-all shadow-sm"
+                      >
+                        {pinUpdated ? "Saved!" : "Save"}
+                      </button>
+                    </div>
+                  </div>
+                  <p className="text-[11px] text-slate-500 mt-1">Clear the box, type your new PIN or password, and click <b>Save</b>.</p>
                 </div>
 
                 <div className="pt-4 border-t border-slate-800">
