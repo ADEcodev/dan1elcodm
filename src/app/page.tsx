@@ -7,7 +7,9 @@ import {
   MoreHorizontal,
   ExternalLink,
   Copy,
-  Globe
+  Globe,
+  X,
+  Mail
 } from "lucide-react";
 import defaultData from "../../data/links.json";
 import { SocialIcon } from "@/components/SocialIcon";
@@ -17,6 +19,7 @@ export default function HomePage() {
   const [data, setData] = useState<SiteData>(defaultData as SiteData);
   const [activeMenuId, setActiveMenuId] = useState<string | null>(null);
   const [copiedLinkId, setCopiedLinkId] = useState<string | null>(null);
+  const [showBrowserNotice, setShowBrowserNotice] = useState(true);
   const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -69,6 +72,11 @@ export default function HomePage() {
       })
       .catch(() => {});
 
+    // Check if user dismissed TikTok helper notice this session
+    if (typeof window !== "undefined" && sessionStorage.getItem("dismiss_tiktok_tip") === "true") {
+      setShowBrowserNotice(false);
+    }
+
     // Close menu on outside click
     const handleClickOutside = (e: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
@@ -108,7 +116,8 @@ export default function HomePage() {
     e.preventDefault();
     e.stopPropagation();
     if (navigator.clipboard) {
-      navigator.clipboard.writeText(link.url);
+      const textToCopy = link.url.startsWith("mailto:") ? link.url.replace("mailto:", "") : link.url;
+      navigator.clipboard.writeText(textToCopy);
       setCopiedLinkId(link.id);
       setTimeout(() => {
         setCopiedLinkId(null);
@@ -122,16 +131,51 @@ export default function HomePage() {
     e.stopPropagation();
     handleLinkClick(link.id);
     setActiveMenuId(null);
-    window.open(link.url, "_blank");
+    if (link.url.startsWith("mailto:")) {
+      window.location.href = link.url;
+    } else {
+      window.open(link.url, "_blank");
+    }
   };
 
   const activeLinks = data.links.filter((l) => l.active !== false);
 
   return (
-    <main className="min-h-screen bg-white text-neutral-900 flex flex-col items-center pt-8 sm:pt-12 pb-10 px-4 sm:px-6 font-sans">
-      {/* Profile Section (Pure Black & White Linktree Style) */}
+    <main className="min-h-screen bg-white text-neutral-900 flex flex-col items-center pt-6 sm:pt-10 pb-10 px-4 sm:px-6 font-sans">
       <div className="w-full max-w-xl flex flex-col items-center text-center">
-        {/* Avatar */}
+        {/* Visual TikTok Browser Helper Banner */}
+        {showBrowserNotice && (
+          <div className="w-full mb-5 p-3.5 rounded-2xl bg-neutral-100 border border-neutral-300 text-neutral-900 flex items-center justify-between gap-3 text-left shadow-xs transition-all animate-fade-in">
+            <div className="flex items-center gap-2.5 min-w-0">
+              <span className="w-7 h-7 rounded-xl bg-black text-white flex items-center justify-center shrink-0 text-xs font-bold shadow-xs">
+                ⚡
+              </span>
+              <div className="min-w-0">
+                <p className="text-xs font-bold text-black leading-tight">
+                  Opening from TikTok?
+                </p>
+                <p className="text-[11px] font-medium text-neutral-600 leading-tight mt-0.5">
+                  Tap <span className="font-bold text-black px-1.5 py-0.5 bg-white border border-neutral-300 rounded text-[10px]">•••</span> top right &amp; choose <span className="font-bold text-black underline">Open in Browser</span> for instant WhatsApp join.
+                </p>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                setShowBrowserNotice(false);
+                if (typeof window !== "undefined") {
+                  sessionStorage.setItem("dismiss_tiktok_tip", "true");
+                }
+              }}
+              className="w-7 h-7 rounded-lg flex items-center justify-center text-neutral-400 hover:text-black hover:bg-neutral-200 transition-colors shrink-0"
+              title="Dismiss tip"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+        )}
+
+        {/* Profile Avatar */}
         <div className="relative mb-3.5">
           <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full overflow-hidden p-0.5 bg-white border-2 border-neutral-200 shadow-md">
             <img
@@ -193,16 +237,33 @@ export default function HomePage() {
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => handleLinkClick(link.id)}
-                className="linktree-card group flex items-center justify-between w-full p-3.5 sm:p-4 rounded-2xl bg-white border border-neutral-200 hover:border-black/40 shadow-[0_2px_8px_rgba(0,0,0,0.03)] text-neutral-900 cursor-pointer transition-all"
+                className={`linktree-card group flex items-center justify-between w-full p-3.5 sm:p-4 rounded-2xl bg-white border ${
+                  link.badge?.includes("Active")
+                    ? "border-black/60 shadow-sm ring-1 ring-black/5"
+                    : "border-neutral-200"
+                } hover:border-black/70 shadow-[0_2px_8px_rgba(0,0,0,0.03)] text-neutral-900 cursor-pointer transition-all`}
               >
                 {/* Left: Vector Icon */}
                 <div className="w-11 h-11 rounded-xl flex items-center justify-center shrink-0 overflow-hidden">
                   <SocialIcon platform={link.platform} fallbackIcon={link.icon} className="w-11 h-11" />
                 </div>
 
-                {/* Center: Title */}
-                <div className="flex-1 text-center font-bold text-sm sm:text-base text-black px-3 tracking-tight truncate">
-                  {link.title}
+                {/* Center: Title & Optional Highlight Badge */}
+                <div className="flex-1 text-center px-2 flex items-center justify-center gap-2 min-w-0">
+                  <span className="font-bold text-sm sm:text-base text-black tracking-tight truncate">
+                    {link.title}
+                  </span>
+                  {link.badge && (
+                    <span
+                      className={`inline-flex items-center text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full shrink-0 shadow-xs ${
+                        link.badge.includes("Active")
+                          ? "bg-black text-white"
+                          : "bg-neutral-100 text-neutral-800 border border-neutral-300"
+                      }`}
+                    >
+                      {link.badge}
+                    </span>
+                  )}
                 </div>
 
                 {/* Right: Three Dots Trigger */}
@@ -223,7 +284,7 @@ export default function HomePage() {
               {/* Three Dots Dropdown Menu */}
               {activeMenuId === link.id && (
                 <div className="absolute right-2 top-full mt-1.5 w-48 bg-white border border-neutral-200 rounded-2xl shadow-xl py-1.5 z-30 animate-fade-in text-left">
-                  {/* Copy Link Option */}
+                  {/* Copy Link / Email Option */}
                   <button
                     type="button"
                     onClick={(e) => handleCopyLink(e, link)}
@@ -232,24 +293,35 @@ export default function HomePage() {
                     {copiedLinkId === link.id ? (
                       <>
                         <Check className="w-4 h-4 text-black stroke-[2.5]" />
-                        <span className="text-black font-bold">Link Copied!</span>
+                        <span className="text-black font-bold">
+                          {link.url.startsWith("mailto:") ? "Email Copied!" : "Link Copied!"}
+                        </span>
                       </>
                     ) : (
                       <>
                         <Copy className="w-4 h-4 text-neutral-500" />
-                        <span>Copy Link</span>
+                        <span>{link.url.startsWith("mailto:") ? "Copy Email Address" : "Copy Link"}</span>
                       </>
                     )}
                   </button>
 
-                  {/* Open in Browser Option */}
+                  {/* Open in Browser / Email Option */}
                   <button
                     type="button"
                     onClick={(e) => handleOpenBrowser(e, link)}
                     className="w-full px-3.5 py-2.5 text-xs font-semibold text-neutral-800 hover:bg-neutral-100 flex items-center gap-2.5 transition-colors border-t border-neutral-100"
                   >
-                    <Globe className="w-4 h-4 text-neutral-500" />
-                    <span>Open in Browser</span>
+                    {link.url.startsWith("mailto:") ? (
+                      <>
+                        <Mail className="w-4 h-4 text-neutral-500" />
+                        <span>Send Email</span>
+                      </>
+                    ) : (
+                      <>
+                        <Globe className="w-4 h-4 text-neutral-500" />
+                        <span>Open in Browser</span>
+                      </>
+                    )}
                   </button>
                 </div>
               )}

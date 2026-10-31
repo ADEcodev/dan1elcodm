@@ -1,4 +1,5 @@
 import React from "react";
+import { Mail } from "lucide-react";
 
 interface SocialIconProps {
   platform: string;
@@ -32,6 +33,15 @@ const DESIGNBOLTS_MAP: Record<string, string> = {
 
 export const SocialIcon: React.FC<SocialIconProps> = ({ platform, className = "w-6 h-6", fallbackIcon }) => {
   const norm = (platform || "").toLowerCase();
+
+  if (norm === "email" || norm === "business" || norm === "contact") {
+    return (
+      <div className={`${className} bg-black rounded-xl flex items-center justify-center text-white shrink-0 shadow-xs`}>
+        <Mail className="w-1/2 h-1/2 text-white stroke-[2.2]" />
+      </div>
+    );
+  }
+
   const iconSrc = DESIGNBOLTS_MAP[norm] || fallbackIcon;
 
   if (iconSrc) {

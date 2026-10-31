@@ -6,6 +6,7 @@ export interface PlatformPreset {
   textColor: string;
   placeholder: string;
   defaultTitle: string;
+  defaultBadge?: string;
 }
 
 export const PLATFORM_PRESETS: PlatformPreset[] = [
@@ -17,6 +18,7 @@ export const PLATFORM_PRESETS: PlatformPreset[] = [
     textColor: "#ffffff",
     placeholder: "https://chat.whatsapp.com/...",
     defaultTitle: "Join My WhatsApp Community",
+    defaultBadge: "🔥 Active",
   },
   {
     id: "tiktok",
@@ -44,6 +46,16 @@ export const PLATFORM_PRESETS: PlatformPreset[] = [
     textColor: "#000000",
     placeholder: "https://www.snapchat.com/add/...",
     defaultTitle: "Add Me on Snapchat",
+  },
+  {
+    id: "email",
+    name: "Business & Collabs",
+    icon: "/images/icons/generic-email.svg",
+    bgColor: "#000000",
+    textColor: "#ffffff",
+    placeholder: "mailto:danielcodm.business@gmail.com",
+    defaultTitle: "Business & Sponsorships",
+    defaultBadge: "Contact",
   },
   {
     id: "discord",

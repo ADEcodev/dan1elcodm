@@ -8,6 +8,7 @@ export interface LinkItem {
   textColor?: string;
   active: boolean;
   clicks: number;
+  badge?: string;
 }
 
 export interface ProfileData {
@@ -18,6 +19,7 @@ export interface ProfileData {
   verified: boolean;
   theme?: string;
   adminPin: string;
+  businessEmail?: string;
 }
 
 export interface SiteData {

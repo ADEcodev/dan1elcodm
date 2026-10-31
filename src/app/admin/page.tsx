@@ -41,6 +41,7 @@ export default function AdminPage() {
   const [selectedPreset, setSelectedPreset] = useState<PlatformPreset>(PLATFORM_PRESETS[0]);
   const [newTitle, setNewTitle] = useState(PLATFORM_PRESETS[0].defaultTitle);
   const [newUrl, setNewUrl] = useState("");
+  const [newBadge, setNewBadge] = useState(PLATFORM_PRESETS[0].defaultBadge || "");
   const [showPin, setShowPin] = useState(false);
   const [showLoginPin, setShowLoginPin] = useState(false);
   const [pinUpdated, setPinUpdated] = useState(false);
@@ -51,6 +52,9 @@ export default function AdminPage() {
   const [profileHandle, setProfileHandle] = useState(defaultData.profile.handle);
   const [profileBio, setProfileBio] = useState(defaultData.profile.bio);
   const [profileAvatar, setProfileAvatar] = useState(defaultData.profile.avatar);
+  const [profileBusinessEmail, setProfileBusinessEmail] = useState(
+    (defaultData.profile as any).businessEmail || "danielcodm.business@gmail.com"
+  );
 
   // Load existing data
   useEffect(() => {
@@ -65,6 +69,7 @@ export default function AdminPage() {
           setProfileHandle(localData.profile.handle || "");
           setProfileBio(localData.profile.bio || "");
           setProfileAvatar(localData.profile.avatar || "");
+          setProfileBusinessEmail(localData.profile.businessEmail || "danielcodm.business@gmail.com");
         }
       } catch (e) {
         console.error(e);
@@ -85,6 +90,7 @@ export default function AdminPage() {
             setProfileHandle(serverData.profile.handle || "");
             setProfileBio(serverData.profile.bio || "");
             setProfileAvatar(serverData.profile.avatar || "");
+            setProfileBusinessEmail(serverData.profile.businessEmail || "danielcodm.business@gmail.com");
             localStorage.setItem("dan1elcodm_links_data", JSON.stringify(serverData));
           }
         }
@@ -190,6 +196,17 @@ export default function AdminPage() {
   };
 
   const handleSaveProfile = () => {
+    const cleanEmail = profileBusinessEmail.trim() || "danielcodm.business@gmail.com";
+    const updatedLinks = data.links.map((link) => {
+      if (link.id === "business-1" || link.platform === "email") {
+        return {
+          ...link,
+          url: `mailto:${cleanEmail}`,
+        };
+      }
+      return link;
+    });
+
     const updated: SiteData = {
       ...data,
       profile: {
@@ -198,8 +215,10 @@ export default function AdminPage() {
         handle: profileHandle.trim() || data.profile.handle,
         bio: profileBio,
         avatar: profileAvatar.trim() || data.profile.avatar,
+        businessEmail: cleanEmail,
         theme: "black-and-white",
       },
+      links: updatedLinks,
     };
 
     handleSave(updated);
@@ -218,6 +237,7 @@ export default function AdminPage() {
       icon: selectedPreset.icon,
       bgColor: selectedPreset.bgColor,
       textColor: selectedPreset.textColor,
+      badge: newBadge.trim() ? newBadge.trim() : undefined,
       active: true,
       clicks: 0,
     };
@@ -229,6 +249,7 @@ export default function AdminPage() {
 
     handleSave(updated);
     setNewUrl("");
+    setNewBadge("");
     setShowAddModal(false);
   };
 
@@ -266,6 +287,7 @@ export default function AdminPage() {
     const found = PLATFORM_PRESETS.find((p) => p.id === presetId) || PLATFORM_PRESETS[0];
     setSelectedPreset(found);
     setNewTitle(found.defaultTitle);
+    setNewBadge(found.defaultBadge || "");
   };
 
   // Login Screen (Pure Black & White)
@@ -510,8 +532,13 @@ export default function AdminPage() {
                         <SocialIcon platform={link.platform} fallbackIcon={link.icon} className="w-10 h-10" />
                       </div>
                       <div className="min-w-0 flex-1">
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 flex-wrap">
                           <p className="text-sm font-bold text-black truncate">{link.title}</p>
+                          {link.badge && (
+                            <span className="text-[10px] px-2 py-0.5 rounded-full bg-black text-white font-bold shrink-0">
+                              {link.badge}
+                            </span>
+                          )}
                           <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-neutral-100 text-black border border-neutral-300 font-bold flex items-center gap-1 shrink-0">
                             <Flame className="w-3 h-3 text-black" />
                             <span>{link.clicks || 0} clicks</span>
@@ -657,6 +684,19 @@ export default function AdminPage() {
                   <p className="text-[11px] text-neutral-400 mt-1">Default local avatar is <code>/images/avatar.png</code></p>
                 </div>
 
+                {/* Business Inquiries Email */}
+                <div>
+                  <label className="block text-xs font-bold text-black mb-1.5">Business & Collaboration Email</label>
+                  <input
+                    type="email"
+                    value={profileBusinessEmail}
+                    onChange={(e) => setProfileBusinessEmail(e.target.value)}
+                    placeholder="danielcodm.business@gmail.com"
+                    className="w-full px-3.5 py-2.5 bg-white border border-neutral-300 rounded-xl text-sm text-black focus:outline-none focus:border-black focus:ring-1 focus:ring-black font-medium shadow-xs"
+                  />
+                  <p className="text-[11px] text-neutral-400 mt-1">Automatically linked with your &quot;Business &amp; Collabs&quot; button.</p>
+                </div>
+
                 {/* Theme Status (Pure Black and White enforced) */}
                 <div className="pt-3 border-t border-neutral-100 flex items-center justify-between">
                   <div className="flex items-center gap-2">
@@ -795,6 +835,16 @@ export default function AdminPage() {
 
             {/* Inner Phone Screen (Black & White Linktree Preview) */}
             <div className="w-full h-full rounded-[38px] overflow-y-auto bg-white flex flex-col items-center pt-9 pb-6 px-3 relative border border-neutral-200 scrollbar-none text-neutral-900">
+              {/* Mini TikTok Browser Notice Preview */}
+              <div className="w-full mb-3 p-2 rounded-xl bg-neutral-100 border border-neutral-200 text-neutral-900 flex items-center gap-2 text-left shrink-0">
+                <span className="w-5 h-5 rounded-md bg-black text-white flex items-center justify-center shrink-0 text-[10px] font-bold">
+                  ⚡
+                </span>
+                <p className="text-[9px] font-medium text-neutral-600 leading-tight">
+                  <span className="font-bold text-black">Opening from TikTok?</span> Tap ••• top right &amp; choose <span className="underline font-bold text-black">Open in Browser</span>.
+                </p>
+              </div>
+
               {/* Profile Avatar */}
               <div className="w-16 h-16 rounded-full overflow-hidden p-0.5 bg-white border border-neutral-200 shadow-xs mb-2 shrink-0">
                 <img
@@ -841,7 +891,20 @@ export default function AdminPage() {
                       <div className="w-6 h-6 rounded-md flex items-center justify-center shrink-0 overflow-hidden">
                         <SocialIcon platform={link.platform} fallbackIcon={link.icon} className="w-6 h-6" />
                       </div>
-                      <span className="flex-1 text-center px-1 truncate font-bold text-black">{link.title}</span>
+                      <div className="flex-1 text-center px-1 flex items-center justify-center gap-1 min-w-0">
+                        <span className="truncate font-bold text-black">{link.title}</span>
+                        {link.badge && (
+                          <span
+                            className={`text-[8px] font-black uppercase px-1.5 py-0.5 rounded-full shrink-0 ${
+                              link.badge.includes("Active")
+                                ? "bg-black text-white"
+                                : "bg-neutral-100 text-neutral-800 border border-neutral-300"
+                            }`}
+                          >
+                            {link.badge}
+                          </span>
+                        )}
+                      </div>
                       <MoreHorizontal className="w-3.5 h-3.5 text-neutral-400 shrink-0" />
                     </div>
                   ))}
@@ -891,6 +954,20 @@ export default function AdminPage() {
                   value={newTitle}
                   onChange={(e) => setNewTitle(e.target.value)}
                   placeholder="e.g. Join Discord Community"
+                  className="w-full px-3.5 py-2.5 bg-white border border-neutral-300 rounded-xl text-sm text-black focus:outline-none focus:border-black focus:ring-1 focus:ring-black font-medium"
+                />
+              </div>
+
+              {/* Badge Input (Optional) */}
+              <div>
+                <label className="block text-xs font-bold text-black mb-1.5">
+                  Badge (Optional, e.g. 🔥 Active, Collabs, New)
+                </label>
+                <input
+                  type="text"
+                  value={newBadge}
+                  onChange={(e) => setNewBadge(e.target.value)}
+                  placeholder="e.g. 🔥 Active"
                   className="w-full px-3.5 py-2.5 bg-white border border-neutral-300 rounded-xl text-sm text-black focus:outline-none focus:border-black focus:ring-1 focus:ring-black font-medium"
                 />
               </div>

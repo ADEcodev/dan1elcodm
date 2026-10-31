@@ -6,9 +6,10 @@
     "avatar": "/images/avatar.png",
     "verified": true,
     "theme": "black-and-white",
-    "adminPin": "Apple2003@"
+    "adminPin": "Apple2003@",
+    "businessEmail": "danielcodm.business@gmail.com"
   },
-  "updatedAt": 1793325000000,
+  "updatedAt": 1793400000000,
   "links": [
     {
       "id": "whatsapp-1",
@@ -18,8 +19,9 @@
       "icon": "/images/designbolts_icons/whatsapp.png",
       "bgColor": "#25D366",
       "textColor": "#ffffff",
+      "badge": "🔥 Active",
       "active": true,
-      "clicks": 0
+      "clicks": 1
     },
     {
       "id": "tiktok-1",
@@ -30,7 +32,7 @@
       "bgColor": "#000000",
       "textColor": "#ffffff",
       "active": true,
-      "clicks": 0
+      "clicks": 1
     },
     {
       "id": "instagram-1",
@@ -51,6 +53,18 @@
       "icon": "/images/designbolts_icons/snapchat.png",
       "bgColor": "#FFFC00",
       "textColor": "#000000",
+      "active": true,
+      "clicks": 0
+    },
+    {
+      "id": "business-1",
+      "title": "Business & Collabs",
+      "url": "mailto:danielcodm.business@gmail.com",
+      "platform": "email",
+      "icon": "/images/icons/generic-email.svg",
+      "bgColor": "#000000",
+      "textColor": "#ffffff",
+      "badge": "Inquiries",
       "active": true,
       "clicks": 0
     }
