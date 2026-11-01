@@ -205,7 +205,7 @@ export default function HomePage() {
         </p>
 
         {/* Welcome Message / Bio (With line breaks preserved) */}
-        {data.profile.bio && (
+        {data.profile.bio && data.profile.bio.trim() !== "" && (
           <p className="text-sm font-medium text-neutral-700 max-w-md mt-3 leading-relaxed px-4 whitespace-pre-line">
             {data.profile.bio}
           </p>

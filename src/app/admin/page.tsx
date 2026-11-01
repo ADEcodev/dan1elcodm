@@ -627,21 +627,17 @@ export default function AdminPage() {
                     </label>
                     <button
                       type="button"
-                      onClick={() =>
-                        setProfileBio(
-                          "Hey Guys it Daniel Here\nJust click the 3 dot on top right corner and open in browser Ciao!"
-                        )
-                      }
+                      onClick={() => setProfileBio("")}
                       className="text-[11px] text-neutral-500 hover:text-black font-semibold underline transition-colors"
                     >
-                      Use Recommended Notice
+                      Clear Bio
                     </button>
                   </div>
                   <textarea
-                    rows={4}
+                    rows={3}
                     value={profileBio}
                     onChange={(e) => setProfileBio(e.target.value)}
-                    placeholder="Hey Guys it Daniel Here..."
+                    placeholder="Optional bio or welcome notice..."
                     className="w-full px-3.5 py-2.5 bg-white border border-neutral-300 rounded-xl text-sm text-black focus:outline-none focus:border-black focus:ring-1 focus:ring-black leading-relaxed font-medium resize-none shadow-xs"
                   />
                   <p className="text-[11px] text-neutral-400 mt-1">
@@ -864,7 +860,7 @@ export default function AdminPage() {
                 )}
               </h3>
               <p className="text-[11px] text-neutral-500 mb-1 font-semibold">{data.profile.handle}</p>
-              {data.profile.bio && (
+              {data.profile.bio && data.profile.bio.trim() !== "" && (
                 <p className="text-[10px] text-neutral-600 text-center max-w-[210px] mb-3 line-clamp-3 leading-relaxed whitespace-pre-line font-medium">
                   {data.profile.bio}
                 </p>
