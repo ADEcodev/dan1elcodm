@@ -78,3 +78,4 @@ export async function getAllCounts(linkIds: string[]): Promise<Record<string, nu
   );
   return counts;
 }
+
