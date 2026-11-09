@@ -9,7 +9,7 @@
     "adminPin": "Apple2003@",
     "businessEmail": "danielcodm.business@gmail.com"
   },
-  "updatedAt": 1793500000000,
+  "updatedAt": 1793505000000,
   "links": [
     {
       "id": "whatsapp-1",
@@ -19,7 +19,6 @@
       "icon": "/images/designbolts_icons/whatsapp.png",
       "bgColor": "#25D366",
       "textColor": "#ffffff",
-      "badge": "🔥 Active",
       "active": true,
       "clicks": 1
     },

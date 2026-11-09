@@ -18,7 +18,6 @@ export const PLATFORM_PRESETS: PlatformPreset[] = [
     textColor: "#ffffff",
     placeholder: "https://chat.whatsapp.com/...",
     defaultTitle: "Join My WhatsApp Community",
-    defaultBadge: "🔥 Active",
   },
   {
     id: "tiktok",
